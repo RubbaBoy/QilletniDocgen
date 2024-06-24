@@ -1,0 +1,140 @@
+@font-face {
+  src: url("/output/fonts/DejaVuSerif.ttf") format("truetype");
+  src: url("/fonts/DejaVuSansMono.ttf") format("truetype");
+  src: url("/fonts/DejaVuSans.ttf") format("truetype");
+}
+:root {
+  --primary-font-family: "DejaVu Serif", Georgia, "Times New Roman", Times, serif;
+  --mono-font-family: "DejaVu Sans Mono", monospace;
+  --sans-font-family: "DejaVu Sans";
+  --function-padding: 0.5em;
+}
+
+body {
+  background: #f8f8f8;
+}
+
+span, p, a, td, h1, h2, h3, h4, h5, h6 {
+  font-family: var(--primary-font-family), serif;
+}
+
+.code {
+  font-family: var(--mono-font-family), monospace;
+}
+
+p {
+  color: #474747;
+  line-height: 1.4;
+}
+
+a {
+  line-height: 1.75;
+  text-decoration: none;
+  color: #2929b7;
+}
+a:visited {
+  color: #2929b7;
+}
+
+.header {
+  border-bottom: gray;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+.pure-menu-link {
+  padding: 1em 0.7em;
+}
+
+.content-container {
+  justify-content: center;
+}
+
+.library-title {
+  margin-bottom: 0.25em;
+}
+
+.library-version {
+  opacity: 0.8;
+  margin-left: 0.5em;
+}
+
+.library-description {
+  margin-top: 2em;
+}
+
+.library-description > p {
+  margin-bottom: 0;
+}
+
+.library-sections .category-column {
+  padding: 0 2em;
+}
+.library-sections .category-column .library-category {
+  margin-top: 4em;
+}
+.library-sections .category-column .library-category .content-subhead {
+  margin-bottom: 1em;
+}
+.library-sections .category-column .library-category .category-list {
+  padding-left: 1em;
+}
+.library-sections .category-column .library-category .category-list a:hover {
+  color: #bb7a2a;
+}
+.library-sections .category-column .library-category .category-list td {
+  padding: 0.5em;
+}
+.library-sections .category-column .library-category .category-list table {
+  width: 100%;
+  border-collapse: collapse;
+  border: thin solid #ddd;
+}
+.library-sections .category-column .library-category .category-list tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.function-definitions {
+  flex-direction: column;
+  width: 100%;
+}
+.function-definitions .function-doc {
+  width: 100%;
+  background: white;
+  margin: 1em 0;
+}
+.function-definitions .function-doc .function-signature {
+  background: #dee3e9;
+  padding: var(--function-padding);
+  font-family: var(--sans-font-family), monospace;
+  font-weight: 700;
+}
+.function-definitions .function-doc .function-innerdoc {
+  padding: 0 var(--function-padding);
+}
+.function-definitions .function-doc .function-innerdoc .function-param-container .param-name {
+  /*font-weight: 700;*/
+  font-family: var(--mono-font-family), monospace;
+  padding-right: 0.25em;
+}
+.function-definitions .function-doc .function-innerdoc .function-param-container .param-type {
+  padding-right: 0.25em;
+  font-size: 10pt;
+  color: #bb7a2a;
+}
+.function-definitions .function-doc .function-innerdoc .function-param-container .param-description::before {
+  content: "-";
+  padding-right: 0.5em;
+  position: relative;
+}
+.function-definitions .function-doc .function-innerdoc .function-return-container .return-type {
+  padding-left: 0.25em;
+  font-size: 10pt;
+  color: #bb7a2a;
+}
+
+.function-params, .function-return, .function-on, .function-error-title {
+  font-weight: 700;
+}
+
+/*# sourceMappingURL=style.css.map */

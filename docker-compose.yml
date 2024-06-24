@@ -1,0 +1,9 @@
+version: '3.8' # You can use any compatible version
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80" # Maps port 8080 on the host to port 80 in the container
+    volumes:
+      - ./output:/usr/share/nginx/html:ro # Mounts the current directory to the Nginx web root

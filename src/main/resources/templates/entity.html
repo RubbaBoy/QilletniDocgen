@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:function="http://www.w3.org/1999/xhtml" xmlns:entity="http://www.w3.org/1999/xhtml" xmlns:formatteddoc="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Qilletni Docs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div>
+    <div class="header">
+        <div class="pure-menu pure-menu-horizontal">
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item pure-menu-selected">
+                    <a href="#" class="pure-menu-link">Overview</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a th:attr="href=${'/library/' + libraryName + '/index.html'}" class="pure-menu-link">Library</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link">Entity</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="pure-g content-container">
+        <div class="pure-u-23-24 colored">
+            <h2 class="library-title" th:text="${name}"></h2>
+<!--            <span class="library-version">v0.0.1 &#x2022;  Adam Yarris</span>-->
+
+            <div class="library-description">
+                <p formatteddoc:desc="${description}"></p>
+            </div>
+
+            <div class="pure-g function-definitions">
+                <div class="function-doc" th:each="documentedFunction : ${functions}">
+                    <div class="function-signature" th:text="${documentedFunction.itemBeingDocumented().name()}"></div>
+
+                    <div class="function-innerdoc">
+                        <p class="code" function:signature="${documentedFunction.itemBeingDocumented()}"></p>
+
+                        <p formatteddoc:desc="${documentedFunction.innerDoc().description()}"></p>
+
+                        <div th:if="${!documentedFunction.innerDoc().paramDocs().isEmpty()}" class="function-param-container">
+                            <span class="function-params">Params</span>
+
+                            <p th:each="param : ${documentedFunction.innerDoc().paramDocs()}">
+                                <span th:text="${param.name()}" class="param-name"></span>
+                                <a th:if="${param.docFieldType() != null}" function:paramtype="${param.docFieldType()}" class="param-type"></a>
+                                <span formatteddoc:desc="${param.description()}" class="param-description"></span>
+                            </p>
+                        </div>
+
+                        <div th:if="${documentedFunction.innerDoc().returnDoc() != null}" class="function-return-container">
+                            <span class="function-params">Returns <a th:if="${documentedFunction.innerDoc().returnDoc().docFieldType() != null}" function:paramtype="${documentedFunction.innerDoc().returnDoc().docFieldType()}" class="return-type"></a></span>
+
+                            <p formatteddoc:desc="${documentedFunction.innerDoc().returnDoc().description()}"></p>
+                        </div>
+
+                        <div th:if="${documentedFunction.innerDoc().docErrors() != null}">
+                            <span class="function-params">Errors</span>
+
+                            <p formatteddoc:desc="${documentedFunction.innerDoc().docErrors().description()}"></p>
+                        </div>
+
+                        <div th:if="${documentedFunction.innerDoc().docOnLine() != null}">
+                            <span class="function-params">On</span>
+
+                            <p formatteddoc:desc="${documentedFunction.innerDoc().docOnLine().description()}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

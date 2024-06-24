@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'is.yarr.qilletni.docgen'
+version = '1.0-SNAPSHOT'
+
+application {
+    mainClass = 'is.yarr.qilletni.docgen.Main'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation ('org.thymeleaf:thymeleaf:3.1.2.RELEASE') {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
+
+    implementation 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT'
+    implementation 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT:sources'
+
+    implementation 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
+
+    // SLF4J API dependency
+    implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.22.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.register('generateHtml', JavaExec) {
+    mainClass = 'is.yarr.qilletni.docgen.Main'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+//tasks.withType(JavaCompile).each {
+//    it.options.compilerArgs.add('--enable-preview')
+//}
+//
+//tasks.withType(JavaCompile).each {
+//    it.options.compilerArgs.add('--enable-preview')
+//}
