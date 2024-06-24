@@ -108,6 +108,20 @@ a:visited {
   padding: var(--function-padding);
   font-family: var(--sans-font-family), monospace;
   font-weight: 700;
+  line-height: 1.5;
+}
+.function-definitions .function-doc .function-signature .function-anchor {
+  display: none;
+  color: black;
+  opacity: 0.5;
+  padding-left: 0.25em;
+  line-height: 1.5;
+}
+.function-definitions .function-doc .function-signature:hover .function-anchor {
+  display: inline;
+}
+.function-definitions .function-doc .function-signature:hover .function-anchor:hover {
+  opacity: 0.3;
 }
 .function-definitions .function-doc .function-innerdoc {
   padding: 0 var(--function-padding);

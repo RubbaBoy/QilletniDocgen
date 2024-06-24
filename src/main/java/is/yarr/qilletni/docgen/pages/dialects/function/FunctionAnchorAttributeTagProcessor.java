@@ -15,12 +15,12 @@ import java.nio.charset.Charset;
 /**
  * Creates a link to a function page.
  */
-public class FunctionHrefAttributeTagProcessor extends AbstractAttributeTagProcessor {
+public class FunctionAnchorAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
-    private static final String ATTR_NAME = "link";
+    private static final String ATTR_NAME = "anchor";
     private static final int PRECEDENCE = 10000;
 
-    protected FunctionHrefAttributeTagProcessor(String dialectPrefix) {
+    protected FunctionAnchorAttributeTagProcessor(String dialectPrefix) {
         super(
                 TemplateMode.HTML, // This processor will apply only to HTML mode
                 dialectPrefix,     // Prefix to be applied to name for matching
@@ -43,7 +43,7 @@ public class FunctionHrefAttributeTagProcessor extends AbstractAttributeTagProce
         if (!(executed instanceof DocumentedTypeFunction documentedFunction)) {
             throw new RuntimeException("Expected a DocumentedTypeFunction, got " + executed);
         }
-
-        structureHandler.setAttribute("href", "#%s".formatted(FunctionAnchorFactory.createAnchorForFunction(documentedFunction)));
+        
+        structureHandler.setAttribute("id", FunctionAnchorFactory.createAnchorForFunction(documentedFunction));
     }
 }

@@ -120,6 +120,25 @@ a {
             padding: var(--function-padding);
             font-family: var(--sans-font-family), monospace;
             font-weight: 700;
+            line-height: 1.5;
+
+            .function-anchor {
+                display: none;
+                color: black;
+                opacity: 0.5;
+                padding-left: 0.25em;
+                line-height: 1.5;
+            }
+            
+            &:hover {
+                .function-anchor {
+                    display: inline;
+                    
+                    &:hover {
+                        opacity: 0.3;
+                    }
+                }
+            }
         }
 
         .function-innerdoc {

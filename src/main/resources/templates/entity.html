@@ -35,7 +35,7 @@
 
             <div class="pure-g function-definitions">
                 <div class="function-doc" th:each="documentedFunction : ${functions}">
-                    <div class="function-signature" th:text="${documentedFunction.itemBeingDocumented().name()}"></div>
+                    <div function:anchor="${documentedFunction.itemBeingDocumented()}" class="function-signature"><span th:text="${documentedFunction.itemBeingDocumented().name()}"></span><a class="function-anchor" function:anchorHref="${documentedFunction.itemBeingDocumented()}">#</a></div>
 
                     <div class="function-innerdoc">
                         <p class="code" function:signature="${documentedFunction.itemBeingDocumented()}"></p>

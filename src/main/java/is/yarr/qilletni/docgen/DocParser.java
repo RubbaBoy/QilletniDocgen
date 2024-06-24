@@ -138,11 +138,13 @@ public class DocParser {
             var documentedType = (DocumentedTypeEntity) documentedItem.itemBeingDocumented();
             var entityDoc = (EntityDoc) documentedItem.innerDoc();
             
+            var path = outputDir.resolve("%s.html".formatted(documentedType.name()));
             
             var context = new Context();
             context.setVariable("libraryName", libraryName);
             context.setVariable("name", documentedType.name());
             context.setVariable("description", entityDoc.description());
+            context.setVariable("currentPath", path.toString());
 
             var entityFields = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeField).toList();
             var entityFunctions = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeFunction).toList();
@@ -153,7 +155,7 @@ public class DocParser {
 
             var templateEngine = createTemplateEngine();
 
-            processAndWrite("templates/entity.html", outputDir.resolve("%s.html".formatted(documentedType.name())), templateEngine, context);
+            processAndWrite("templates/entity.html", path, templateEngine, context);
         }
     }
     
