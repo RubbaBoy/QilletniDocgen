@@ -4,11 +4,14 @@ import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedType;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
+import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntityConstructor;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeField;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
+import is.yarr.qilletni.api.lang.docs.structure.text.inner.ConstructorDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
+import is.yarr.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
 import is.yarr.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
 import is.yarr.qilletni.docgen.pages.dialects.entity.EntityDialect;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionDialect;
@@ -26,7 +29,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -42,6 +47,7 @@ public class DocParser {
     private final List<DocumentedItem> entityDocs;
     private final List<DocumentedItem> functionDocs;
     private final List<DocumentedItem> fieldDocs;
+    private final Map<String, List<DocumentedItem>> entityConstructors;
     
     private final List<DocumentedItem> onExtensionDocs;
 
@@ -51,6 +57,7 @@ public class DocParser {
         this.entityDocs = new ArrayList<>();
         this.functionDocs = new ArrayList<>();
         this.fieldDocs = new ArrayList<>();
+        this.entityConstructors = new HashMap<>();
         this.onExtensionDocs = new ArrayList<>();
     }
 
@@ -66,7 +73,7 @@ public class DocParser {
 
                     var parser = new DefaultDocumentationParser();
 
-                    var documentedFile = parser.parseDocsFromPath(file);
+                    var documentedFile = parser.parseDocsFromPath(file, input.relativize(file).toString().replace("\\", "/"));
                     documentedFiles.add(documentedFile);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -99,6 +106,7 @@ public class DocParser {
         templateEngine.addDialect(new FunctionDialect());
         templateEngine.addDialect(new EntityDialect(libraryName));
         templateEngine.addDialect(new FormattedDocDialect());
+        templateEngine.addDialect(new ConstructorDialect());
         
         return templateEngine;
     }
@@ -126,7 +134,7 @@ public class DocParser {
 
         var outputDir = Files.createDirectories(Paths.get("output").resolve(getBasePath()));
 
-        processAndWrite("templates/index.html", outputDir.resolve("index.html"), templateEngine, context);
+        processAndWrite("templates/library.html", outputDir.resolve("index.html"), templateEngine, context);
     }
     
     public void createEntityFiles() throws IOException {
@@ -142,15 +150,18 @@ public class DocParser {
             
             var context = new Context();
             context.setVariable("libraryName", libraryName);
+            context.setVariable("fileName", documentedType.importPath());
             context.setVariable("name", documentedType.name());
             context.setVariable("description", entityDoc.description());
             context.setVariable("currentPath", path.toString());
 
             var entityFields = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeField).toList();
             var entityFunctions = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeFunction).toList();
+            var entityConstructors = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeEntityConstructor).toList();
 
             context.setVariable("fields", entityFields);
             context.setVariable("functions", entityFunctions);
+            context.setVariable("constructors", entityConstructors);
 //        context.setVariable("fieldDocs", fieldDocs);
 
             var templateEngine = createTemplateEngine();
@@ -160,6 +171,12 @@ public class DocParser {
     }
     
     private void initDocumentedItems() {
+        documentedFiles.stream()
+                .filter(documentedFile -> documentedFile.documentedItems() != null)
+                .flatMap(documentedFile -> documentedFile.documentedItems().stream()).forEach(documentedItem -> {
+                    System.out.println("documentedItem = " + documentedItem);
+                });
+        
         documentedFiles.stream()
                 .filter(documentedFile -> documentedFile.documentedItems() != null)
                 .flatMap(documentedFile -> documentedFile.documentedItems().stream())
@@ -174,6 +191,14 @@ public class DocParser {
                             } else {
                                 functionDocs.add(documentedItem);
                             }
+                        }
+                        case ConstructorDoc $ -> { // Ignored, there will be none on a file-level (only entity level)
+//                            System.out.println("got const doc " + documentedItem.itemBeingDocumented());
+//                            entityConstructors.merge(((DocumentedTypeEntity) documentedItem.itemBeingDocumented()).name(), List.of(documentedItem), (a, b) -> {
+//                                var newList = new ArrayList<>(a);
+//                                newList.addAll(b);
+//                                return newList;
+//                            });
                         }
                     }
                 });
@@ -192,5 +217,7 @@ public class DocParser {
         functionDocs.sort((a, b) -> Comparator.comparing((DocumentedItem item) -> ((DocumentedTypeFunction) item.itemBeingDocumented()).onOptional().isPresent())
                 .thenComparing(item -> ((DocumentedTypeFunction) item.itemBeingDocumented()).name())
                 .compare(a, b));
+
+        System.out.println("entityConstructors = " + entityConstructors);
     }
 }

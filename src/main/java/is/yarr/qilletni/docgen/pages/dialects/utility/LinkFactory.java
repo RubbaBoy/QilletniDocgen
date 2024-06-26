@@ -102,7 +102,6 @@ public class LinkFactory {
 
     private static String generateQilletniTypeLink(String qilletniType) {
         var split = qilletniType.split("\\.");
-        System.out.println("split = " + Arrays.toString(split));
         return "/library/%s/entity/%s.html".formatted(split[0], split[1]);
     }
     

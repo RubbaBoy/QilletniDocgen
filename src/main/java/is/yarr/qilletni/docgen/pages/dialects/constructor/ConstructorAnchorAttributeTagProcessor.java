@@ -1,5 +1,6 @@
-package is.yarr.qilletni.docgen.pages.dialects.function;
+package is.yarr.qilletni.docgen.pages.dialects.constructor;
 
+import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntityConstructor;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
 import is.yarr.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -10,18 +11,15 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.standard.expression.StandardExpressions;
 import org.thymeleaf.templatemode.TemplateMode;
 
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-
 /**
  * Creates a link to a function page.
  */
-public class FunctionAnchorAttributeTagProcessor extends AbstractAttributeTagProcessor {
+public class ConstructorAnchorAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
     private static final String ATTR_NAME = "anchor";
     private static final int PRECEDENCE = 10000;
 
-    protected FunctionAnchorAttributeTagProcessor(String dialectPrefix) {
+    protected ConstructorAnchorAttributeTagProcessor(String dialectPrefix) {
         super(
                 TemplateMode.HTML, // This processor will apply only to HTML mode
                 dialectPrefix,     // Prefix to be applied to name for matching
@@ -41,10 +39,10 @@ public class FunctionAnchorAttributeTagProcessor extends AbstractAttributeTagPro
         var expr = expressionParser.parseExpression(context, attributeValue);
 
         var executed = expr.execute(context);
-        if (!(executed instanceof DocumentedTypeFunction documentedFunction)) {
-            throw new RuntimeException("Expected a DocumentedTypeFunction, got " + executed);
+        if (!(executed instanceof DocumentedTypeEntityConstructor documentedEntityConstructor)) {
+            throw new RuntimeException("Expected a DocumentedTypeEntityConstructor, got " + executed);
         }
         
-        structureHandler.setAttribute("id", AnchorFactory.createAnchorForFunction(documentedFunction));
+        structureHandler.setAttribute("id", AnchorFactory.createAnchorForConstructor(documentedEntityConstructor));
     }
 }

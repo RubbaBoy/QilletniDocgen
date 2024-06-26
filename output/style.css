@@ -14,7 +14,7 @@ body {
   background: #f8f8f8;
 }
 
-span, p, a, td, h1, h2, h3, h4, h5, h6 {
+span, p, a, td, th, h1, h2, h3, h4, h5, h6 {
   font-family: var(--primary-font-family), serif;
 }
 
@@ -34,6 +34,9 @@ a {
 }
 a:visited {
   color: #2929b7;
+}
+a:hover {
+  color: #bb7a2a;
 }
 
 .header {
@@ -59,8 +62,9 @@ a:visited {
   margin-left: 0.5em;
 }
 
-.library-description {
+.page-description {
   margin-top: 2em;
+  margin-bottom: 1em;
 }
 
 .library-description > p {
@@ -71,16 +75,13 @@ a:visited {
   padding: 0 2em;
 }
 .library-sections .category-column .library-category {
-  margin-top: 4em;
+  margin-top: 3em;
 }
 .library-sections .category-column .library-category .content-subhead {
   margin-bottom: 1em;
 }
 .library-sections .category-column .library-category .category-list {
   padding-left: 1em;
-}
-.library-sections .category-column .library-category .category-list a:hover {
-  color: #bb7a2a;
 }
 .library-sections .category-column .library-category .category-list td {
   padding: 0.5em;
@@ -94,54 +95,87 @@ a:visited {
   background-color: #f2f2f2;
 }
 
-.function-definitions {
+.function-definitions, .constructor-definitions, .doc-overview {
   flex-direction: column;
   width: 100%;
+  margin-top: 1em;
 }
-.function-definitions .function-doc {
+.function-definitions > h3, .constructor-definitions > h3, .doc-overview > h3 {
+  margin-bottom: 0;
+}
+
+.doc-overview {
+  display: flex;
+}
+.doc-overview .doc-overview-container {
+  margin-top: 1em;
+}
+.doc-overview .doc-overview-container td, .doc-overview .doc-overview-container th {
+  padding: 0.5em;
+}
+.doc-overview .doc-overview-container table {
+  width: 100%;
+  border-collapse: collapse;
+  border: thin solid #ddd;
+}
+.doc-overview .doc-overview-container .left-column {
+  min-width: 25%;
+  width: 25%;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.doc-overview .doc-overview-container tr:nth-child(odd):not(.overview-header) {
+  background-color: #f2f2f2;
+}
+.doc-overview .doc-overview-container .overview-header {
+  background-color: #dee3e9;
+  text-align: left;
+}
+
+.function-doc {
   width: 100%;
   background: white;
-  margin: 1em 0;
+  margin-top: 1em;
 }
-.function-definitions .function-doc .function-signature {
+.function-doc .function-signature {
   background: #dee3e9;
   padding: var(--function-padding);
   font-family: var(--sans-font-family), monospace;
   font-weight: 700;
   line-height: 1.5;
 }
-.function-definitions .function-doc .function-signature .function-anchor {
+.function-doc .function-signature .function-anchor {
   display: none;
   color: black;
   opacity: 0.5;
   padding-left: 0.25em;
   line-height: 1.5;
 }
-.function-definitions .function-doc .function-signature:hover .function-anchor {
+.function-doc .function-signature:hover .function-anchor {
   display: inline;
 }
-.function-definitions .function-doc .function-signature:hover .function-anchor:hover {
+.function-doc .function-signature:hover .function-anchor:hover {
   opacity: 0.3;
 }
-.function-definitions .function-doc .function-innerdoc {
+.function-doc .function-innerdoc {
   padding: 0 var(--function-padding);
 }
-.function-definitions .function-doc .function-innerdoc .function-param-container .param-name {
+.function-doc .function-innerdoc .function-param-container .param-name {
   /*font-weight: 700;*/
   font-family: var(--mono-font-family), monospace;
   padding-right: 0.25em;
 }
-.function-definitions .function-doc .function-innerdoc .function-param-container .param-type {
+.function-doc .function-innerdoc .function-param-container .param-type {
   padding-right: 0.25em;
   font-size: 10pt;
   color: #bb7a2a;
 }
-.function-definitions .function-doc .function-innerdoc .function-param-container .param-description::before {
+.function-doc .function-innerdoc .function-param-container .param-description::before {
   content: "-";
   padding-right: 0.5em;
   position: relative;
 }
-.function-definitions .function-doc .function-innerdoc .function-return-container .return-type {
+.function-doc .function-innerdoc .function-return-container .return-type {
   padding-left: 0.25em;
   font-size: 10pt;
   color: #bb7a2a;

@@ -1,6 +1,7 @@
 package is.yarr.qilletni.docgen.pages.dialects.function;
 
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
+import is.yarr.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -44,6 +45,6 @@ public class FunctionHrefAttributeTagProcessor extends AbstractAttributeTagProce
             throw new RuntimeException("Expected a DocumentedTypeFunction, got " + executed);
         }
 
-        structureHandler.setAttribute("href", "#%s".formatted(FunctionAnchorFactory.createAnchorForFunction(documentedFunction)));
+        structureHandler.setAttribute("href", "#%s".formatted(AnchorFactory.createAnchorForFunction(documentedFunction)));
     }
 }
