@@ -1,0 +1,25 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="11">
+            <item index="0" class="java.lang.String" itemvalue="function:signature" />
+            <item index="1" class="java.lang.String" itemvalue="function:link" />
+            <item index="2" class="java.lang.String" itemvalue="entity:link" />
+            <item index="3" class="java.lang.String" itemvalue="formatteddoc:desc" />
+            <item index="4" class="java.lang.String" itemvalue="function:paramtype" />
+            <item index="5" class="java.lang.String" itemvalue="function:anchor" />
+            <item index="6" class="java.lang.String" itemvalue="constructor:signature" />
+            <item index="7" class="java.lang.String" itemvalue="constructor:anchorHref" />
+            <item index="8" class="java.lang.String" itemvalue="function:anchorHref" />
+            <item index="9" class="java.lang.String" itemvalue="constructor:link" />
+            <item index="10" class="java.lang.String" itemvalue="constructor:anchor" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+  </profile>
+</component>

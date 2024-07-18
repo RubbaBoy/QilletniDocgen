@@ -34,6 +34,9 @@ dependencies {
 
     implementation 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
 
+    // For caching scanned libraries
+    implementation 'org.msgpack:msgpack-core:0.8.3'
+
     // SLF4J API dependency
     implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
@@ -43,16 +46,26 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+//    doFirst {
+//        classpath = files()
+//        jvmArgs = [
+//                '--module-path', sourceSets.test.runtimeClasspath.asPath,
+//                '--add-modules', 'ALL-MODULE-PATH',
+//                '--add-reads', 'test=ALL-UNNAMED'
+//        ]
+//    }
+//}
+
+tasks.compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath
+        ]
+        classpath = files()
+    }
+}
 
 tasks.register('generateHtml', JavaExec) {
     mainClass = 'is.yarr.qilletni.docgen.Main'
     classpath = sourceSets.main.runtimeClasspath
 }
-
-//tasks.withType(JavaCompile).each {
-//    it.options.compilerArgs.add('--enable-preview')
-//}
-//
-//tasks.withType(JavaCompile).each {
-//    it.options.compilerArgs.add('--enable-preview')
-//}

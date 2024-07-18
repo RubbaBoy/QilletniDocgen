@@ -4,4 +4,5 @@ module QilletniDocgen.main {
     requires is.yarr.qilletni.Qilletni.main;
     requires org.slf4j;
     requires unbescape;
+    requires msgpack.core;
 }
