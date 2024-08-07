@@ -222,3 +222,20 @@ a {
 .function-params, .function-return, .function-on, .function-error-title {
     font-weight: 700;
 }
+
+.footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid #ccc;
+    
+    p {
+        margin: 0;
+        font-size: 0.9em;
+        color: #333;
+    }
+}

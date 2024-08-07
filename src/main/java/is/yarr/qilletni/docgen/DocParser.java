@@ -2,7 +2,6 @@ package is.yarr.qilletni.docgen;
 
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
-import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedType;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntityConstructor;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeField;
@@ -11,16 +10,15 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.ConstructorDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
+import is.yarr.qilletni.docgen.cache.CachedDocHandler;
 import is.yarr.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
 import is.yarr.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
 import is.yarr.qilletni.docgen.pages.dialects.entity.EntityDialect;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionDialect;
-import is.yarr.qilletni.lang.docs.DefaultDocumentationParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.FileWriter;
@@ -29,19 +27,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
+/**
+ * Creates weg pages for a single library.
+ * The overall index page is displayed differently
+ */
 public class DocParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocParser.class);
-    
-    private String libraryName;
+
+    private final CachedDocHandler cachedDocHandler;
+    private final String libraryName;
     
     private final List<DocumentedFile> documentedFiles;
     private final List<DocumentedItem> entityDocs;
@@ -51,7 +51,8 @@ public class DocParser {
     
     private final List<DocumentedItem> onExtensionDocs;
 
-    public DocParser(String libraryName, List<DocumentedFile> documentedFiles) {
+    public DocParser(CachedDocHandler cachedDocHandler, String libraryName, List<DocumentedFile> documentedFiles) {
+        this.cachedDocHandler = cachedDocHandler;
         this.libraryName = libraryName;
         this.documentedFiles = documentedFiles;
         this.entityDocs = new ArrayList<>();
@@ -60,43 +61,19 @@ public class DocParser {
         this.entityConstructors = new HashMap<>();
         this.onExtensionDocs = new ArrayList<>();
     }
-
-    public static DocParser createDocParser(String libraryName, Path input) {
-        var documentedFiles = new ArrayList<DocumentedFile>();
-
-        try (var walk = Files.walk(input)) {
-            walk.forEach(file -> {
-                if (Files.isDirectory(file) || !file.getFileName().toString().endsWith(".ql")) return;
-
-                try {
-                    LOGGER.debug("Parsing file: {}", file.getFileName());
-
-                    var parser = new DefaultDocumentationParser();
-
-                    var documentedFile = parser.parseDocsFromPath(file, input.relativize(file).toString().replace("\\", "/"));
-                    documentedFiles.add(documentedFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        LOGGER.debug("Documented files:");
-
-        for (DocumentedFile documentedFile : documentedFiles) {
-            System.out.println(documentedFile.fileName() + ":");
-            System.out.println(documentedFile + "\n");
-        }
-        
-        return new DocParser(libraryName, documentedFiles);
-    }
     
     public Path getBasePath() {
         return Paths.get("library", libraryName);
     }
-    
+
+    public String getLibraryName() {
+        return libraryName;
+    }
+
+    public List<DocumentedFile> getDocumentedFiles() {
+        return documentedFiles;
+    }
+
     private TemplateEngine createTemplateEngine() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setSuffix(".html");
@@ -113,7 +90,6 @@ public class DocParser {
     
     private void processAndWrite(String templatePath, Path outputPath, TemplateEngine templateEngine, Context context) throws IOException {
         String output = templateEngine.process(templatePath, context);
-        
         
         try (FileWriter writer = new FileWriter(outputPath.toFile())) {
             writer.write(output);
@@ -219,5 +195,9 @@ public class DocParser {
                 .compare(a, b));
 
         System.out.println("entityConstructors = " + entityConstructors);
+    }
+
+    public void writeToCache() {
+        cachedDocHandler.writeLibraryCache(this);
     }
 }

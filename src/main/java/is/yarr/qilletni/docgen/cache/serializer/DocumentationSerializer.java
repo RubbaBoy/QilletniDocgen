@@ -1,6 +1,7 @@
 package is.yarr.qilletni.docgen.cache.serializer;
 
 import is.yarr.qilletni.api.lang.docs.structure.DocFieldType;
+import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedType;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
@@ -20,16 +21,31 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.InnerDoc;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessagePacker;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 public class DocumentationSerializer implements AutoCloseable {
     
     private final MessagePacker packer;
     
-    public DocumentationSerializer(ByteArrayOutputStream outputStream) {
+    public DocumentationSerializer(OutputStream outputStream) {
         packer = MessagePack.newDefaultPacker(outputStream);
+    }
+    
+    public void serializeDocumentedFileList(List<DocumentedFile> documentedFiles) throws IOException {
+        packer.packArrayHeader(documentedFiles.size());
+        for (var documentedFile : documentedFiles) {
+            serializeDocumentedFile(documentedFile);
+        }
+    }
+
+    public void serializeDocumentedFile(DocumentedFile documentedFile) throws IOException {
+        packer.packString(documentedFile.fileName());
+        packer.packArrayHeader(documentedFile.documentedItems().size());
+        for (var documentedItem : documentedFile.documentedItems()) {
+            serializeDocumentedItem(documentedItem);
+        }
     }
     
     public void serializeDocumentedItem(DocumentedItem documentedItem) throws IOException {
@@ -65,12 +81,12 @@ public class DocumentationSerializer implements AutoCloseable {
                 if (documentedTypeFunction.onOptional().isPresent()) {
                     packer.packString(documentedTypeFunction.onOptional().get());
                 } else {
-                    packer.packNil();
+                    packNilPlaceholder(NilPlaceholder.NO_ON_TYPE);
                 }
             }
         }
     }
-    
+
     public void serializeInnerDoc(InnerDoc innerDoc) throws IOException {
         packer.packInt(SerializationUtility.getInnerDocIndex(innerDoc));
 
@@ -95,6 +111,7 @@ public class DocumentationSerializer implements AutoCloseable {
             }
             case FunctionDoc functionDoc -> {
                 serializeDocDescription(functionDoc.description());
+
                 serializeParamDocList(functionDoc.paramDocs());
                 serializeReturnDoc(functionDoc.returnDoc());
                 serializeDocOnLine(functionDoc.docOnLine());
@@ -104,24 +121,44 @@ public class DocumentationSerializer implements AutoCloseable {
     }
 
     public void serializeDocErrors(DocErrors docErrors) throws IOException {
+        if (docErrors == null) {
+            packNilPlaceholder(NilPlaceholder.NO_ERRORS);
+            return;
+        }
+        
         serializeDocDescription(docErrors.description());
     }
 
     public void serializeDocOnLine(DocOnLine docOnLine) throws IOException {
+        if (docOnLine == null) {
+            packNilPlaceholder(NilPlaceholder.NO_ON_LINE);
+            return;
+        }
+        
         serializeDocDescription(docOnLine.description());
     }
 
     public void serializeReturnDoc(ReturnDoc returnDoc) throws IOException {
+        if (returnDoc == null) {
+            packNilPlaceholder(NilPlaceholder.NO_RETURN);
+            return;
+        }
+
         serializeDocFieldType(returnDoc.docFieldType());
         serializeDocDescription(returnDoc.description());
     }
 
     public void serializeDocFieldType(DocFieldType docFieldType) throws IOException {
+        if (docFieldType == null) {
+            packNilPlaceholder(NilPlaceholder.NO_FIELD_TYPE);
+            return;
+        }
+
         packer.packInt(docFieldType.fieldType().ordinal());
         packer.packString(docFieldType.identifier());
     }
 
-    private void serializeParamDocList(List<ParamDoc> paramDocs) throws IOException {
+    public void serializeParamDocList(List<ParamDoc> paramDocs) throws IOException {
         packer.packArrayHeader(paramDocs.size());
         for (var paramDoc : paramDocs) {
             serializeParamDoc(paramDoc);
@@ -137,12 +174,18 @@ public class DocumentationSerializer implements AutoCloseable {
 
     public void serializeParamDoc(ParamDoc paramDoc) throws IOException {
         packer.packString(paramDoc.name());
+        System.out.println("Packing param name:  " + paramDoc.name());
         serializeDocFieldType(paramDoc.docFieldType());
         serializeDocDescription(paramDoc.description());
     }
 
     public void serializeDocDescription(DocDescription docDescription) throws IOException {
-        packer.packInt(docDescription.descriptionItems().size());
+        if (docDescription == null) {
+            packNilPlaceholder(NilPlaceholder.NO_DESCRIPTION);
+            return;
+        }
+        
+        packer.packArrayHeader(docDescription.descriptionItems().size());
 
         for (var descriptionItem : docDescription.descriptionItems()) {
             serializeDescriptionItem(descriptionItem);
@@ -150,6 +193,7 @@ public class DocumentationSerializer implements AutoCloseable {
     }
 
     public void serializeDescriptionItem(DocDescription.DescriptionItem descriptionItem) throws IOException {
+        System.out.println("Packing desc item index: " + SerializationUtility.getDescriptionItemIndex(descriptionItem));
         packer.packInt(SerializationUtility.getDescriptionItemIndex(descriptionItem));
 
         switch (descriptionItem) {
@@ -158,6 +202,24 @@ public class DocumentationSerializer implements AutoCloseable {
             case DocDescription.ParamRef paramRef -> packer.packString(paramRef.paramName());
             case DocDescription.TypeRef typeRef -> packer.packString(typeRef.typeName());
         }
+    }
+
+    public long getTotalWrittenBytes() {
+        return packer.getTotalWrittenBytes();
+    }
+    
+    private void packNilPlaceholder(NilPlaceholder nilPlaceholder) throws IOException {
+        packer.packNil();
+        packer.packInt(nilPlaceholder.ordinal());
+    }
+
+    public enum NilPlaceholder {
+        NO_ERRORS,
+        NO_ON_LINE,
+        NO_ON_TYPE,
+        NO_RETURN,
+        NO_FIELD_TYPE,
+        NO_DESCRIPTION;
     }
 
     @Override

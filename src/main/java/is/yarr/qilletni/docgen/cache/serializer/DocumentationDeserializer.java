@@ -1,6 +1,7 @@
 package is.yarr.qilletni.docgen.cache.serializer;
 
 import is.yarr.qilletni.api.lang.docs.structure.DocFieldType;
+import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedType;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
@@ -17,21 +18,55 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.InnerDoc;
+import is.yarr.qilletni.docgen.cache.serializer.DocumentationSerializer.NilPlaceholder;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessageUnpacker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DocumentationDeserializer implements AutoCloseable {
     
-    private final MessageUnpacker unpacker;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentationDeserializer.class);
     
-    public DocumentationDeserializer(ByteArrayInputStream inputStream) {
+    private final MessageUnpacker unpacker;
+    private final UnpackerHandler unpackerHandler;
+    
+    public DocumentationDeserializer(InputStream inputStream) throws NoSuchFieldException, IllegalAccessException {
         unpacker = MessagePack.newDefaultUnpacker(inputStream);
+        unpackerHandler = new UnpackerHandler(unpacker);
+    }
+    
+    public List<DocumentedFile> deserializeDocumentedFileList() throws IOException {
+        var size = unpacker.unpackArrayHeader();
+        
+        var documentedFiles = new ArrayList<DocumentedFile>();
+        for (int i = 0; i < size; i++) {
+            documentedFiles.add(deserializeDocumentedFile());
+        }
+        
+        return documentedFiles;
+    }
+    
+    public DocumentedFile deserializeDocumentedFile() throws IOException {
+        var fileName = unpacker.unpackString();
+        var documentedItemsSize = unpacker.unpackArrayHeader();
+
+        LOGGER.debug("Deserializing file: {} with {} items", fileName, documentedItemsSize);
+        
+        var documentedItems = new ArrayList<DocumentedItem>();
+        for (int i = 0; i < documentedItemsSize; i++) {
+            var documentedItem = deserializeDocumentedItem();
+            documentedItems.add(documentedItem);
+        }
+        
+        return new DocumentedFile(fileName, documentedItems);
     }
     
     public DocumentedItem deserializeDocumentedItem() throws IOException {
@@ -74,9 +109,7 @@ public class DocumentationDeserializer implements AutoCloseable {
 
                 var onType = Optional.<String>empty();
                 
-                if (unpacker.getNextFormat().getValueType().isNilType()) {
-                    unpacker.unpackNil();
-                } else {
+                if (!hasNilPlaceholderNext(NilPlaceholder.NO_ON_TYPE)) {
                     onType = Optional.of(unpacker.unpackString());
                 }
 
@@ -91,7 +124,7 @@ public class DocumentationDeserializer implements AutoCloseable {
         return switch (innerDocType) {
             case 0 -> { // ConstructorDoc
                 var docDescription = deserializeDocDescription();
-                var params = deserializeParams();
+                var params = deserializeParamDocList();
 
                 yield new ConstructorDoc(docDescription, params);
             }
@@ -109,7 +142,8 @@ public class DocumentationDeserializer implements AutoCloseable {
             case 2 -> new FieldDoc(deserializeDocDescription(), deserializeDocFieldType());
             case 3 -> { // FunctionDoc
                 var docDescription = deserializeDocDescription();
-                var params = deserializeParams();
+
+                var params = deserializeParamDocList();
                 var returnDoc = deserializeReturnDoc();
                 var docOnLine = deserializeDocOnLine();
                 var docErrors = deserializeDocErrors();
@@ -121,30 +155,47 @@ public class DocumentationDeserializer implements AutoCloseable {
     }
 
     public DocErrors deserializeDocErrors() throws IOException {
+        if (hasNilPlaceholderNext(NilPlaceholder.NO_ERRORS)) {
+            return null;
+        }
+        
         return new DocErrors(deserializeDocDescription());
     }
 
     public DocOnLine deserializeDocOnLine() throws IOException {
+        if (hasNilPlaceholderNext(NilPlaceholder.NO_ON_LINE)) {
+            return null;
+        }
+        
         return new DocOnLine(deserializeDocDescription());
     }
 
     public ReturnDoc deserializeReturnDoc() throws IOException {
+        if (hasNilPlaceholderNext(NilPlaceholder.NO_RETURN)) {
+            return null;
+        }
+        
         return new ReturnDoc(deserializeDocFieldType(), deserializeDocDescription());
     }
     
     public DocFieldType deserializeDocFieldType() throws IOException {
+        if (hasNilPlaceholderNext(NilPlaceholder.NO_FIELD_TYPE)) {
+            return null;
+        }
+
         var fieldType = DocFieldType.FieldType.values()[unpacker.unpackInt()];
         var identifier = unpacker.unpackString();
         
         return new DocFieldType(fieldType, identifier);
     }
     
-    private List<ParamDoc> deserializeParams() throws IOException {
+    public List<ParamDoc> deserializeParamDocList() throws IOException {
         var paramSize = unpacker.unpackArrayHeader();
 
         var params = new ArrayList<ParamDoc>();
         for (int i = 0; i < paramSize; i++) {
-            params.add(deserializeParamDoc());
+            var paramDoc = deserializeParamDoc();
+            params.add(paramDoc);
         }
         
         return params;
@@ -170,7 +221,11 @@ public class DocumentationDeserializer implements AutoCloseable {
     }
 
     public DocDescription deserializeDocDescription() throws IOException {
-        var size = unpacker.unpackInt();
+        if (hasNilPlaceholderNext(NilPlaceholder.NO_DESCRIPTION)) {
+            return null;
+        }
+        
+        var size = unpacker.unpackArrayHeader();
         var descriptionItems = new ArrayList<DocDescription.DescriptionItem>(size);
 
         for (var i = 0; i < size; i++) {
@@ -178,6 +233,19 @@ public class DocumentationDeserializer implements AutoCloseable {
         }
 
         return new DocDescription(descriptionItems);
+    }
+    
+    private boolean hasNilPlaceholderNext(NilPlaceholder nilPlaceholder) throws IOException {
+        if (unpacker.getNextFormat().getValueType().isNilType()) {
+            var ordinalByte = unpackerHandler.getMessageBuffer().getByte(unpackerHandler.getUnpackerPosition() + 1); // Get not this, but the next byte
+            if (ordinalByte == nilPlaceholder.ordinal()) {
+                unpacker.unpackNil(); // Nil byte
+                unpacker.unpackInt(); // Ordinal byte
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

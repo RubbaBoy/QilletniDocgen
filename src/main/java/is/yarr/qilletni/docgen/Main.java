@@ -13,10 +13,11 @@ import java.nio.file.Paths;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        var docParser = DocParser.createDocParser("spotify", Paths.get("E:\\Qilletni\\qilletni-lib-std\\qilletni-src"));
+        var docParser = DocParserFactory.createDocParser("spotify", Paths.get("E:\\Qilletni\\qilletni-lib-std\\qilletni-src"), Paths.get("doc-cache"));
         
         docParser.createIndexFile();
         docParser.createEntityFiles();
+        docParser.writeToCache();
         
 //        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 //        templateResolver.setSuffix(".html");

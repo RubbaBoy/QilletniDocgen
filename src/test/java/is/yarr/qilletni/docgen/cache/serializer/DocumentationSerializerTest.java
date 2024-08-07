@@ -1,6 +1,7 @@
 package is.yarr.qilletni.docgen.cache.serializer;
 
 import is.yarr.qilletni.api.lang.docs.structure.DocFieldType;
+import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedType;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
@@ -37,6 +38,60 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DocumentationSerializerTest {
 
+    static Stream<DocumentedFile> documentedFileProvider() {
+        return Stream.of(
+                new DocumentedFile("ExampleFile1", List.of(
+                        new DocumentedItem(
+                                new DocumentedTypeEntity("EntityExample1", "com.example.EntityExample1"),
+                                new EntityDoc(new DocDescription(Collections.emptyList()), Collections.emptyList())
+                        )
+                )),
+                new DocumentedFile("ExampleFile2", List.of(
+                        new DocumentedItem(
+                                new DocumentedTypeEntity("EntityExample2", "com.example.EntityExample2"),
+                                new EntityDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Example description"))), Collections.emptyList())
+                        )
+                )),
+                // New examples
+                new DocumentedFile("ComplexFile", List.of(
+                        new DocumentedItem(
+                                new DocumentedTypeFunction("ComplexFunction", "com.example.ComplexFunction", List.of("paramX", "paramY"), true, Optional.of("ReturnType")),
+                                new FunctionDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function description"))), Collections.emptyList(), null, null, null)
+                        ),
+                        new DocumentedItem(
+                                new DocumentedTypeField("FieldExample", "com.example.FieldExample", "String"),
+                                new FieldDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Field description"))), new DocFieldType(DocFieldType.FieldType.JAVA, "String"))
+                        )
+                )),
+                new DocumentedFile("EmptyFile", Collections.emptyList()),
+                new DocumentedFile("MultiTypeFile", List.of(
+                        new DocumentedItem(
+                                new DocumentedTypeEntityConstructor("ConstructorExample", "com.example.ConstructorExample", List.of("param1", "param2")),
+                                new ConstructorDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Constructor description"))), Collections.emptyList())
+                        ),
+                        new DocumentedItem(
+                                new DocumentedTypeEntity("EmptyEntity", "com.example.EmptyEntity"),
+                                new EntityDoc(new DocDescription(Collections.emptyList()), Collections.emptyList())
+                        )
+                ))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("documentedFileProvider")
+    void testSerializeDeserializeDocumentedFile(DocumentedFile originalFile) throws Exception {
+        var outputStream = new ByteArrayOutputStream();
+        var serializer = new DocumentationSerializer(outputStream);
+        serializer.serializeDocumentedFile(originalFile);
+        serializer.close();
+
+        var inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        var deserializer = new DocumentationDeserializer(inputStream);
+        DocumentedFile deserializedFile = deserializer.deserializeDocumentedFile();
+
+        assertEquals(originalFile, deserializedFile);
+    }
+
     static Stream<DocumentedItem> documentedItemProvider() {
         return Stream.of(
                 new DocumentedItem(
@@ -56,8 +111,51 @@ class DocumentationSerializerTest {
                         new EntityDoc(new DocDescription(Collections.emptyList()), Collections.emptyList())
                 ),
                 new DocumentedItem(
+                        new DocumentedTypeFunction("ComplexFunction", "com.example.ComplexFunction", Collections.emptyList(), true, Optional.empty()),
+                        new FunctionDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params"))), Collections.emptyList(), new ReturnDoc(new DocFieldType(DocFieldType.FieldType.JAVA, "void"), new DocDescription(Collections.emptyList())), new DocOnLine(new DocDescription(Collections.singletonList(new DocDescription.DocText("Online doc text")))), new DocErrors(new DocDescription(Collections.singletonList(new DocDescription.DocText("Error text")))))
+                ),
+                new DocumentedItem(
                         new DocumentedTypeFunction("ComplexFunction", "com.example.ComplexFunction", List.of("paramX", "paramY"), true, Optional.empty()),
                         new FunctionDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params"))), Collections.emptyList(), new ReturnDoc(new DocFieldType(DocFieldType.FieldType.JAVA, "void"), new DocDescription(Collections.emptyList())), new DocOnLine(new DocDescription(Collections.singletonList(new DocDescription.DocText("Online doc text")))), new DocErrors(new DocDescription(Collections.singletonList(new DocDescription.DocText("Error text")))))
+                ),
+                new DocumentedItem(
+                        new DocumentedTypeFunction("ComplexFunction", "com.example.ComplexFunction", List.of("paramX", "paramY"), true, Optional.empty()),
+                        new FunctionDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params"))), List.of(new ParamDoc("paramX", new DocFieldType(DocFieldType.FieldType.JAVA, "int"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params")))), new ParamDoc("paramY", new DocFieldType(DocFieldType.FieldType.QILLETNI, "boolean"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params"))))), new ReturnDoc(new DocFieldType(DocFieldType.FieldType.JAVA, "void"), new DocDescription(Collections.emptyList())), new DocOnLine(new DocDescription(Collections.singletonList(new DocDescription.DocText("Online doc text")))), new DocErrors(new DocDescription(Collections.singletonList(new DocDescription.DocText("Error text")))))
+                ),
+                new DocumentedItem(
+                        new DocumentedTypeFunction("ComplexFunction", "com.example.ComplexFunction", List.of("paramX", "paramY"), true, Optional.empty()),
+                        new FunctionDoc(new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params"))), List.of(new ParamDoc("paramX", new DocFieldType(DocFieldType.FieldType.JAVA, "int"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params")))), new ParamDoc("paramY", new DocFieldType(DocFieldType.FieldType.QILLETNI, "boolean"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Complex function with multiple params"))))), new ReturnDoc(new DocFieldType(DocFieldType.FieldType.JAVA, "void"), new DocDescription(Collections.emptyList())), new DocOnLine(new DocDescription(Collections.singletonList(new DocDescription.DocText("Online doc text")))), new DocErrors(new DocDescription(Collections.singletonList(new DocDescription.DocText("Error text")))))
+                ),
+                new DocumentedItem(
+                        new DocumentedTypeFunction(
+                                "getEnv",
+                                "core.ql",
+                                List.of("name"),
+                                true,
+                                Optional.empty()
+                        ),
+                        new FunctionDoc(
+                                new DocDescription(
+                                        List.of(new DocDescription.DocText("Gets the environment variable of a given name. This will return a string, or throw an error if it can't be found."))
+                                ),
+                                List.of(
+                                        new ParamDoc(
+                                                "name",
+                                                new DocFieldType(DocFieldType.FieldType.QILLETNI, "string"),
+                                                new DocDescription(
+                                                        List.of(new DocDescription.DocText("The name of the environment variable to get"))
+                                                )
+                                        )
+                                ),
+                                new ReturnDoc(
+                                        null,
+                                        new DocDescription(
+                                                List.of(new DocDescription.DocText("The value of the environment variable"))
+                                        )
+                                ),
+                                null,
+                                null
+                        )
                 )
         );
     }
@@ -227,12 +325,12 @@ class DocumentationSerializerTest {
     
     static Stream<ParamDoc> paramDocProvider() {
         return Stream.of(
-                new ParamDoc("paramName", new DocFieldType(DocFieldType.FieldType.JAVA, "int"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Param text")))),
-                new ParamDoc("paramName", new DocFieldType(DocFieldType.FieldType.QILLETNI, "int"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Param text")))),
-                new ParamDoc("paramName", new DocFieldType(DocFieldType.FieldType.JAVA, "boolean"), new DocDescription(List.of(new DocDescription.DocText("Param text"), new DocDescription.JavaRef("HashMap")))),
-                new ParamDoc("paramName", new DocFieldType(DocFieldType.FieldType.QILLETNI, "boolean"), new DocDescription(List.of(new DocDescription.DocText("Param text"), new DocDescription.JavaRef("HashMap")))),
-                new ParamDoc("paramName", new DocFieldType(DocFieldType.FieldType.JAVA, "string"), new DocDescription(Collections.emptyList())),
-                new ParamDoc("paramName", new DocFieldType(DocFieldType.FieldType.QILLETNI, "string"), new DocDescription(Collections.emptyList()))
+                new ParamDoc("paramName1", new DocFieldType(DocFieldType.FieldType.JAVA, "int"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Param text")))),
+                new ParamDoc("paramName2", new DocFieldType(DocFieldType.FieldType.QILLETNI, "int"), new DocDescription(Collections.singletonList(new DocDescription.DocText("Param text")))),
+                new ParamDoc("paramName3", new DocFieldType(DocFieldType.FieldType.JAVA, "boolean"), new DocDescription(List.of(new DocDescription.DocText("Param text"), new DocDescription.JavaRef("HashMap")))),
+                new ParamDoc("paramName4", new DocFieldType(DocFieldType.FieldType.QILLETNI, "boolean"), new DocDescription(List.of(new DocDescription.DocText("Param text"), new DocDescription.JavaRef("HashMap")))),
+                new ParamDoc("paramName5", new DocFieldType(DocFieldType.FieldType.JAVA, "string"), new DocDescription(Collections.emptyList())),
+                new ParamDoc("paramName6", new DocFieldType(DocFieldType.FieldType.QILLETNI, "string"), new DocDescription(Collections.emptyList()))
         );
     }
     
@@ -249,6 +347,21 @@ class DocumentationSerializerTest {
         ParamDoc deserializedParamDoc = deserializer.deserializeParamDoc();
         
         assertEquals(originalParamDoc, deserializedParamDoc);
+    }
+    
+    @Test
+    void testSerializeDeserializeParamDocList() throws Exception {
+        var outputStream = new ByteArrayOutputStream();
+        var serializer = new DocumentationSerializer(outputStream);
+        var originalParamDocs = paramDocProvider().toList();
+        serializer.serializeParamDocList(originalParamDocs);
+        serializer.close();
+
+        var inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        var deserializer = new DocumentationDeserializer(inputStream);
+        var deserializedParamDocs = deserializer.deserializeParamDocList();
+        
+        assertEquals(originalParamDocs, deserializedParamDocs);
     }
 
     static Stream<DocDescription.DescriptionItem> descriptionItemProvider() {
@@ -274,4 +387,18 @@ class DocumentationSerializerTest {
 
         assertEquals(originalItem, deserializedItem);
     }
+    
+//    @Test
+//    void testLargerSerializeDeserialize() {
+//        var outputStream = new ByteArrayOutputStream();
+//        var serializer = new DocumentationSerializer(outputStream);
+//        serializer.serializeParamDoc();
+//        serializer.close();
+//
+//        var inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+//        var deserializer = new DocumentationDeserializer(inputStream);
+//        var deserializedItem = deserializer.deserializeDescriptionItem();
+//
+//        assertEquals(originalItem, deserializedItem);
+//    }
 }
