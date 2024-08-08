@@ -56,6 +56,7 @@ public class DocumentationSerializer implements AutoCloseable {
     public void serializeDocumentedType(DocumentedType documentedType) throws IOException {
         packer.packInt(SerializationUtility.getDocumentedTypeIndex(documentedType));
         
+        packer.packString(documentedType.libraryName());
         packer.packString(documentedType.importPath());
 
         switch (documentedType) {
@@ -98,11 +99,9 @@ public class DocumentationSerializer implements AutoCloseable {
             }
             case EntityDoc entityDoc -> {
                 serializeDocDescription(entityDoc.description());
-                
-                packer.packArrayHeader(entityDoc.containedItems().size());
-                for (var containedItem : entityDoc.containedItems()) {
-                    serializeDocumentedItem(containedItem);
-                }
+
+                serializeDocumentedItemList(entityDoc.containedItems());
+                serializeDocumentedItemList(entityDoc.onExtensionFunctions());
             }
             case FieldDoc fieldDoc -> {
                 serializeDocDescription(fieldDoc.description());
@@ -135,6 +134,7 @@ public class DocumentationSerializer implements AutoCloseable {
             return;
         }
         
+        serializeDocFieldType(docOnLine.docFieldType());
         serializeDocDescription(docOnLine.description());
     }
 
@@ -157,6 +157,13 @@ public class DocumentationSerializer implements AutoCloseable {
         packer.packInt(docFieldType.fieldType().ordinal());
         packer.packString(docFieldType.identifier());
     }
+    
+    public void serializeDocumentedItemList(List<DocumentedItem> documentedItems) throws IOException {
+        packer.packArrayHeader(documentedItems.size());
+        for (var documentedItem : documentedItems) {
+            serializeDocumentedItem(documentedItem);
+        }
+    }
 
     public void serializeParamDocList(List<ParamDoc> paramDocs) throws IOException {
         packer.packArrayHeader(paramDocs.size());
@@ -174,7 +181,6 @@ public class DocumentationSerializer implements AutoCloseable {
 
     public void serializeParamDoc(ParamDoc paramDoc) throws IOException {
         packer.packString(paramDoc.name());
-        System.out.println("Packing param name:  " + paramDoc.name());
         serializeDocFieldType(paramDoc.docFieldType());
         serializeDocDescription(paramDoc.description());
     }
@@ -193,7 +199,6 @@ public class DocumentationSerializer implements AutoCloseable {
     }
 
     public void serializeDescriptionItem(DocDescription.DescriptionItem descriptionItem) throws IOException {
-        System.out.println("Packing desc item index: " + SerializationUtility.getDescriptionItemIndex(descriptionItem));
         packer.packInt(SerializationUtility.getDescriptionItemIndex(descriptionItem));
 
         switch (descriptionItem) {

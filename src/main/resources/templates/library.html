@@ -105,7 +105,7 @@
                                 <table>
                                     <tr th:each="documentedFunction : ${onExtensionDocs}">
                                         <td>
-                                            <a function:link="${documentedFunction.itemBeingDocumented()}" function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
+                                            <a function:onlink="${documentedFunction}" function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
                                         </td>
                                         <td>This is a description for redirectToList.</td>
                                     </tr>

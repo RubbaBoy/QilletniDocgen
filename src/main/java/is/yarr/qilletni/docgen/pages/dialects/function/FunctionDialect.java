@@ -15,6 +15,7 @@ public class FunctionDialect extends AbstractProcessorDialect {
     public Set<IProcessor> getProcessors(String dialectPrefix) {
         return Set.of(new FunctionSignatureAttributeTagProcessor(dialectPrefix),
                 new FunctionHrefAttributeTagProcessor(dialectPrefix),
+                new FunctionOnHrefAttributeTagProcessor(dialectPrefix),
                 new FunctionParamTypeAttributeTagProcessor(dialectPrefix),
                 new FunctionAnchorAttributeTagProcessor(dialectPrefix));
     }

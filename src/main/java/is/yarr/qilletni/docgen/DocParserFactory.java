@@ -6,15 +6,22 @@ import is.yarr.qilletni.lang.docs.DefaultDocumentationParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class DocParserFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocParserFactory.class);
+
+    public static Optional<DocParser> createDocParserFromCache(String libraryName, Path cachePath) {
+        var cachedDocParserHandler = new CachedDocHandler(cachePath);
+        return cachedDocParserHandler.getCachedLibrayDocParser(libraryName);
+    }
 
     public static DocParser createDocParser(String libraryName, Path input, Path cachePath) {
         try {
@@ -43,7 +50,7 @@ public class DocParserFactory {
                 try {
                     LOGGER.debug("Parsing file: {}", file.getFileName());
 
-                    var parser = new DefaultDocumentationParser();
+                    var parser = new DefaultDocumentationParser(libraryName);
 
                     var documentedFile = parser.parseDocsFromPath(file, input.relativize(file).toString().replace("\\", "/"));
                     documentedFiles.add(documentedFile);

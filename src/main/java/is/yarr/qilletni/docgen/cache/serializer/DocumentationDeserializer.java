@@ -91,17 +91,18 @@ public class DocumentationDeserializer implements AutoCloseable {
     
     public DocumentedType deserializeDocumentedType() throws IOException {
         var index = unpacker.unpackInt();
+        var libraryName = unpacker.unpackString();
         var importPath = unpacker.unpackString();
         
         return switch (index) {
-            case 0 -> new DocumentedTypeEntity(importPath, unpacker.unpackString());
+            case 0 -> new DocumentedTypeEntity(libraryName, importPath, unpacker.unpackString());
             case 1 -> {
                 var name = unpacker.unpackString();
                 var params = deserializeParamNames();
                 
-                yield new DocumentedTypeEntityConstructor(importPath, name, params);
+                yield new DocumentedTypeEntityConstructor(libraryName, importPath, name, params);
             }
-            case 2 -> new DocumentedTypeField(importPath, unpacker.unpackString(), unpacker.unpackString());
+            case 2 -> new DocumentedTypeField(libraryName, importPath, unpacker.unpackString(), unpacker.unpackString());
             case 3 -> {
                 var name = unpacker.unpackString();
                 var params = deserializeParamNames();
@@ -113,7 +114,7 @@ public class DocumentationDeserializer implements AutoCloseable {
                     onType = Optional.of(unpacker.unpackString());
                 }
 
-                yield new DocumentedTypeFunction(importPath, name, params, isNative, onType);
+                yield new DocumentedTypeFunction(libraryName, importPath, name, params, isNative, onType);
             }
             default -> throw new IllegalArgumentException("Invalid index: " + index);
         };
@@ -130,14 +131,11 @@ public class DocumentationDeserializer implements AutoCloseable {
             }
             case 1 -> { // EntityDoc
                 var docDescription = deserializeDocDescription();
-                var containedItemsSize = unpacker.unpackArrayHeader();
 
-                var containedItems = new ArrayList<DocumentedItem>();
-                for (int i = 0; i < containedItemsSize; i++) {
-                    containedItems.add(deserializeDocumentedItem());
-                }
+                var containedItems = deserializeDocumentedItemList();
+                var onExtensionFunctions = deserializeDocumentedItemList();
 
-                yield new EntityDoc(docDescription, containedItems);
+                yield new EntityDoc(docDescription, containedItems, onExtensionFunctions);
             }
             case 2 -> new FieldDoc(deserializeDocDescription(), deserializeDocFieldType());
             case 3 -> { // FunctionDoc
@@ -167,7 +165,7 @@ public class DocumentationDeserializer implements AutoCloseable {
             return null;
         }
         
-        return new DocOnLine(deserializeDocDescription());
+        return new DocOnLine(deserializeDocFieldType(), deserializeDocDescription());
     }
 
     public ReturnDoc deserializeReturnDoc() throws IOException {
@@ -187,6 +185,17 @@ public class DocumentationDeserializer implements AutoCloseable {
         var identifier = unpacker.unpackString();
         
         return new DocFieldType(fieldType, identifier);
+    }
+    
+    public List<DocumentedItem> deserializeDocumentedItemList() throws IOException {
+        var size = unpacker.unpackArrayHeader();
+        
+        var documentedItems = new ArrayList<DocumentedItem>();
+        for (int i = 0; i < size; i++) {
+            documentedItems.add(deserializeDocumentedItem());
+        }
+        
+        return documentedItems;
     }
     
     public List<ParamDoc> deserializeParamDocList() throws IOException {

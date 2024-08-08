@@ -142,6 +142,50 @@
                     </div>
                 </div>
             </div>
+
+            <div th:if="${!extensionFunctions.isEmpty()}" class="pure-g function-definitions">
+                <h3>Extension Functions</h3>
+
+                <div class="function-doc" th:each="documentedFunction : ${extensionFunctions}">
+                    <div function:anchor="${documentedFunction.itemBeingDocumented()}" class="function-signature">
+                        <span th:text="${documentedFunction.itemBeingDocumented().name()}"></span><a class="function-anchor" function:link="${documentedFunction.itemBeingDocumented()}">#</a>
+                    </div>
+
+                    <div class="function-innerdoc">
+                        <p class="code" function:signature="${documentedFunction.itemBeingDocumented()}"></p>
+
+                        <p formatteddoc:desc="${documentedFunction.innerDoc().description()}"></p>
+
+                        <div th:if="${!documentedFunction.innerDoc().paramDocs().isEmpty()}" class="function-param-container">
+                            <span class="function-params">Params</span>
+
+                            <p th:each="param : ${documentedFunction.innerDoc().paramDocs()}">
+                                <span th:text="${param.name()}" class="param-name"></span>
+                                <a th:if="${param.docFieldType() != null}" function:paramtype="${param.docFieldType()}" class="param-type"></a>
+                                <span formatteddoc:desc="${param.description()}" class="param-description"></span>
+                            </p>
+                        </div>
+
+                        <div th:if="${documentedFunction.innerDoc().returnDoc() != null}" class="function-return-container">
+                            <span class="function-params">Returns <a th:if="${documentedFunction.innerDoc().returnDoc().docFieldType() != null}" function:paramtype="${documentedFunction.innerDoc().returnDoc().docFieldType()}" class="return-type"></a></span>
+
+                            <p formatteddoc:desc="${documentedFunction.innerDoc().returnDoc().description()}"></p>
+                        </div>
+
+                        <div th:if="${documentedFunction.innerDoc().docErrors() != null}">
+                            <span class="function-params">Errors</span>
+
+                            <p formatteddoc:desc="${documentedFunction.innerDoc().docErrors().description()}"></p>
+                        </div>
+
+                        <div th:if="${documentedFunction.innerDoc().docOnLine() != null}">
+                            <span class="function-params">On</span>
+
+                            <p formatteddoc:desc="${documentedFunction.innerDoc().docOnLine().description()}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

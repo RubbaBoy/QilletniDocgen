@@ -102,10 +102,15 @@ public class LinkFactory {
 
     private static String generateQilletniTypeLink(String qilletniType) {
         var split = qilletniType.split("\\.");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("Invalid Qilletni entity type. Expected 'library.EntityName' or native entity (e.g. list, song). Got: '" + qilletniType + "'");
+        }
+        
         return "/library/%s/entity/%s.html".formatted(split[0], split[1]);
     }
     
-    private static boolean isNativeType(String qilletniType) {
+    // TODO: Move out of this class
+    public static boolean isNativeType(String qilletniType) {
         return NATIVE_QILLETNI_TYPES.contains(qilletniType);
     }
 
