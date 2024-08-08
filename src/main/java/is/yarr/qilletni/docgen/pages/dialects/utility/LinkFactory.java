@@ -18,7 +18,6 @@ public class LinkFactory {
     
     private static final String JAVA_DOC_BASE_URL = "https://docs.oracle.com/en/java/javase/21/docs/api/";
     private static final Map<String, String> MODULE_MAP = new HashMap<>();
-    private static final List<String> NATIVE_QILLETNI_TYPES = List.of("int", "string", "boolean", "collection", "song", "album", "java", "list");
     
     public static void createDescriptionLinkToType(IModelFactory modelFactory, IModel model, DocDescription.DescriptionItem descriptionItem) {
         switch (descriptionItem) {
@@ -34,12 +33,7 @@ public class LinkFactory {
                 model.add(modelFactory.createCloseElementTag("i"));
             }
             case DocDescription.TypeRef typeRef -> {
-                if (isNativeType(typeRef.typeName())) {
-                    model.add(modelFactory.createOpenElementTag("a"));
-                } else {
-                    model.add(modelFactory.createOpenElementTag("a", "href", generateQilletniTypeLink(typeRef.typeName())));
-                }
-                
+                model.add(modelFactory.createOpenElementTag("a", "href", generateQilletniTypeLink(typeRef.typeName())));
                 model.add(modelFactory.createText(" %s ".formatted(URLEncoder.encode(getNameFromQilletniType(typeRef.typeName()), Charset.defaultCharset()))));
                 model.add(modelFactory.createCloseElementTag("a"));
             }
@@ -51,10 +45,7 @@ public class LinkFactory {
         
         switch (docFieldType.fieldType()) {
             case QILLETNI -> {
-                if (!isNativeType(identifier)) {
-                    structureHandler.setAttribute("href", generateQilletniTypeLink(identifier));
-                }
-                
+                structureHandler.setAttribute("href", generateQilletniTypeLink(identifier));
                 structureHandler.setBody(" %s ".formatted(URLEncoder.encode(getNameFromQilletniType(identifier), Charset.defaultCharset())), false);
             }
             case JAVA -> {
@@ -100,18 +91,21 @@ public class LinkFactory {
         return split[split.length - 1];
     }
 
-    private static String generateQilletniTypeLink(String qilletniType) {
-        var split = qilletniType.split("\\.");
-        if (split.length != 2) {
-            throw new IllegalArgumentException("Invalid Qilletni entity type. Expected 'library.EntityName' or native entity (e.g. list, song). Got: '" + qilletniType + "'");
+    private static String generateQilletniTypeLink(String qilletniTypeString) {
+        if (TypeUtility.isNativeType(qilletniTypeString)) {
+            return generateQilletniTypeLink("std", qilletniTypeString);
         }
         
-        return "/library/%s/entity/%s.html".formatted(split[0], split[1]);
+        var split = qilletniTypeString.split("\\.");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("Invalid Qilletni entity type. Expected 'library.EntityName' or native entity (e.g. list, song). Got: '" + qilletniTypeString + "'");
+        }
+        
+        return generateQilletniTypeLink(split[0], split[1]);
     }
-    
-    // TODO: Move out of this class
-    public static boolean isNativeType(String qilletniType) {
-        return NATIVE_QILLETNI_TYPES.contains(qilletniType);
+
+    private static String generateQilletniTypeLink(String libraryName, String qilletniType) {
+        return "/library/%s/entity/%s.html".formatted(libraryName, qilletniType);
     }
 
     static {

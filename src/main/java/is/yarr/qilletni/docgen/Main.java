@@ -5,6 +5,7 @@ import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
 import is.yarr.qilletni.docgen.pages.dialects.utility.LinkFactory;
+import is.yarr.qilletni.docgen.pages.dialects.utility.TypeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
@@ -65,19 +66,12 @@ public class Main {
 //                            });
 //                });
 
-        allOnExtensionDocs.stream().filter(docItem -> !LinkFactory.isNativeType(((DocumentedTypeFunction) docItem.itemBeingDocumented()).onOptional().orElse(""))) // Ensure a non-native Entity on type
-                .collect(Collectors.groupingBy(docItem -> {
-                    if (docItem instanceof DocumentedItem(
-                            DocumentedTypeFunction documentedTypeFunction, FunctionDoc functionDoc
-                    )) {
-                        if (functionDoc.docOnLine() != null && functionDoc.docOnLine().docFieldType() != null) {
-                            return functionDoc.docOnLine().docFieldType().identifier().split("\\.")[0]; // library.Entity format
-                        }
-                    }
-                    
-                    return "-";
-                })).forEach((libraryName, items) -> {
-                    if (libraryName.equals("-")) return;
+        allOnExtensionDocs.stream()
+//                .filter(docItem -> !TypeUtility.isNativeType(((DocumentedTypeFunction) docItem.itemBeingDocumented()).onOptional().orElse(""))) // Ensure a non-native Entity on type
+                .collect(Collectors.groupingBy(TypeUtility::getOnStatus)).forEach((onStatusInfo, items) -> {
+                    var libraryName = onStatusInfo.libraryName();
+                    System.out.println("libraryName = " + libraryName);
+                    if (libraryName.isEmpty()) return;
                     
                     LOGGER.info("  {}", libraryName);
                     
@@ -87,7 +81,7 @@ public class Main {
                         return;
                     }
 
-                    System.out.println("cachedLibrary = " + cachedLibrary);
+//                    System.out.println("cachedLibrary = " + cachedLibrary);
 
                     items.forEach(item -> {
                         var documentedFunction = (DocumentedTypeFunction) item.itemBeingDocumented();

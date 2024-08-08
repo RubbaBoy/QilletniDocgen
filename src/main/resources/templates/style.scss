@@ -28,20 +28,6 @@ p {
     line-height: 1.4;
 }
 
-a {
-    line-height: 1.75;
-    text-decoration: none;
-    color: #2929b7;
-    
-    &:visited {
-        color: #2929b7; 
-    }
-
-    &:hover {
-        color: #bb7a2a;
-    }
-}
-
 .header {
     border-bottom: gray;
     border-bottom-width: 1px;
@@ -142,6 +128,16 @@ a {
             width: 25%;
             white-space: nowrap;
             font-weight: 700;
+            
+            .from-extension {
+                margin-left: 1em;
+                font-size: 0.9em;
+                color: #474747;
+
+                &:hover {
+                    color: #bb7a2a;
+                }
+            }
         }
 
         tr:nth-child(odd):not(.overview-header) {
@@ -159,6 +155,16 @@ a {
     width: 100%;
     background: white;
     margin-top: 1em;
+
+    .from-extension {
+        margin-left: 1em;
+        font-size: 0.8em;
+        color: #474747;
+
+        &:hover {
+            color: #bb7a2a;
+        }
+    }
 
     .function-signature {
         background: #dee3e9;
@@ -227,15 +233,29 @@ a {
     text-align: center;
     padding: 10px;
     background-color: #f1f1f1;
-    position: fixed;
     width: 100%;
     bottom: 0;
     left: 0;
     border-top: 1px solid #ccc;
+    margin-top: 2em;
     
     p {
         margin: 0;
         font-size: 0.9em;
         color: #333;
+    }
+}
+
+a {
+    line-height: 1.75;
+    text-decoration: none;
+    color: #2929b7;
+
+    &:visited {
+        color: #2929b7;
+    }
+
+    &:hover {
+        color: #bb7a2a;
     }
 }

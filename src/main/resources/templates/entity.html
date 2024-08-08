@@ -63,9 +63,10 @@
                             <th>Description</th>
                         </tr>
 
-                        <tr th:each="documentedFunction : ${functions}">
+                        <tr th:each="documentedFunction : ${allFunctions}">
                             <td class="left-column">
                                 <a function:link="${documentedFunction.itemBeingDocumented()}" function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
+                                <a function:fromExtension="${documentedFunction}" class="from-extension"></a>
                             </td>
                             <td formatteddoc:desc="${documentedFunction.innerDoc().description()}"></td>
                         </tr>
@@ -148,7 +149,7 @@
 
                 <div class="function-doc" th:each="documentedFunction : ${extensionFunctions}">
                     <div function:anchor="${documentedFunction.itemBeingDocumented()}" class="function-signature">
-                        <span th:text="${documentedFunction.itemBeingDocumented().name()}"></span><a class="function-anchor" function:link="${documentedFunction.itemBeingDocumented()}">#</a>
+                        <span th:text="${documentedFunction.itemBeingDocumented().name()}"></span><a function:fromExtension="${documentedFunction}" class="from-extension"></a><a class="function-anchor" function:link="${documentedFunction.itemBeingDocumented()}">#</a>
                     </div>
 
                     <div class="function-innerdoc">

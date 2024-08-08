@@ -12,6 +12,7 @@ import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.standard.expression.StandardExpressions;
 import org.thymeleaf.templatemode.TemplateMode;
+import org.unbescape.html.HtmlEscape;
 
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -19,12 +20,12 @@ import java.nio.charset.Charset;
 /**
  * Creates a link to a function page.
  */
-public class FunctionOnHrefAttributeTagProcessor extends AbstractAttributeTagProcessor {
+public class FunctionFromExtensionAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
-    private static final String ATTR_NAME = "onlink";
+    private static final String ATTR_NAME = "fromExtension";
     private static final int PRECEDENCE = 10000;
 
-    protected FunctionOnHrefAttributeTagProcessor(String dialectPrefix) {
+    protected FunctionFromExtensionAttributeTagProcessor(String dialectPrefix) {
         super(
                 TemplateMode.HTML, // This processor will apply only to HTML mode
                 dialectPrefix,     // Prefix to be applied to name for matching
@@ -48,10 +49,22 @@ public class FunctionOnHrefAttributeTagProcessor extends AbstractAttributeTagPro
             throw new RuntimeException("Expected a DocumentedTypeFunction, got " + executed);
         }
 
+        if (documentedFunction.onOptional().isEmpty()) {
+            structureHandler.removeElement();
+//            structureHandler.setAttribute("href", "#ahhh");
+            return;
+        }
+
+//        var splitIdentifier = functionDoc.docOnLine().docFieldType().identifier().split("\\.");
+//        var libraryName = splitIdentifier[0];
+//        var entityName = splitIdentifier[1];
+
         var onStatusInfo = TypeUtility.getOnStatus(((DocumentedItem) executed));
 
-        var pageLinkText = "/library/%s/entity/%s.html".formatted(URLEncoder.encode(onStatusInfo.libraryName(), Charset.defaultCharset()), URLEncoder.encode(onStatusInfo.entityName(), Charset.defaultCharset()));
+        var filePageLinkText = "/library/%s/file/%s.html".formatted(URLEncoder.encode(documentedFunction.libraryName(), Charset.defaultCharset()), URLEncoder.encode(documentedFunction.importPath(), Charset.defaultCharset()));
 
-        structureHandler.setAttribute("href", "%s#%s".formatted(pageLinkText, AnchorFactory.createAnchorForFunction(documentedFunction)));
+        structureHandler.setAttribute("href", "%s#%s".formatted(filePageLinkText, AnchorFactory.createAnchorForFunction(documentedFunction)));
+
+        structureHandler.setBody(HtmlEscape.escapeHtml5("from %s:%s".formatted(onStatusInfo.libraryName(), documentedFunction.importPath())), false);
     }
 }

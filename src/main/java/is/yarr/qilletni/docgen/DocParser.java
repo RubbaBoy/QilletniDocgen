@@ -7,6 +7,7 @@ import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntityConstructor;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeField;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
+import is.yarr.qilletni.api.lang.docs.structure.text.DocDescription;
 import is.yarr.qilletni.api.lang.docs.structure.text.DocOnLine;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.ConstructorDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
@@ -19,6 +20,7 @@ import is.yarr.qilletni.docgen.pages.dialects.entity.EntityDialect;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionDialect;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
 import is.yarr.qilletni.docgen.pages.dialects.utility.LinkFactory;
+import is.yarr.qilletni.docgen.pages.dialects.utility.TypeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
@@ -35,6 +37,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Creates weg pages for a single library.
@@ -46,6 +49,7 @@ public class DocParser {
 
     private final CachedDocHandler cachedDocHandler;
     private final String libraryName;
+    private final boolean isStd;
     
     private final List<DocumentedFile> documentedFiles;
     private final List<DocumentedItem> entityDocs;
@@ -58,6 +62,7 @@ public class DocParser {
     public DocParser(CachedDocHandler cachedDocHandler, String libraryName, List<DocumentedFile> documentedFiles) {
         this.cachedDocHandler = cachedDocHandler;
         this.libraryName = libraryName;
+        this.isStd = libraryName.equals("std");
         this.documentedFiles = documentedFiles;
         this.entityDocs = new ArrayList<>();
         this.functionDocs = new ArrayList<>();
@@ -121,7 +126,6 @@ public class DocParser {
         var outputDir = Files.createDirectories(Paths.get("output").resolve(getBasePath())).resolve("entity");
         Files.createDirectories(outputDir);
 
-//        for (DocumentedItem documentedItem : entityDocs.stream().filter(documentedItem -> ((DocumentedTypeEntity) documentedItem.itemBeingDocumented()).name().equals("Map")).toList()) {
         for (DocumentedItem documentedItem : entityDocs) {
             var documentedType = (DocumentedTypeEntity) documentedItem.itemBeingDocumented();
             var entityDoc = (EntityDoc) documentedItem.innerDoc();
@@ -144,7 +148,8 @@ public class DocParser {
             context.setVariable("functions", entityFunctions);
             context.setVariable("extensionFunctions", entityExtensionFunctions);
             context.setVariable("constructors", entityConstructors);
-//        context.setVariable("fieldDocs", fieldDocs);
+            
+            context.setVariable("allFunctions", Stream.of(entityFunctions, entityExtensionFunctions).flatMap(List::stream).toList());
 
             var templateEngine = createTemplateEngine();
 
@@ -158,14 +163,16 @@ public class DocParser {
             var functionDoc = (FunctionDoc) addingDocItem.innerDoc();
             var documentedTypeFunction = (DocumentedTypeFunction) addingDocItem.itemBeingDocumented();
 
-            var identifier = functionDoc.docOnLine().docFieldType().identifier(); // always not null if here
-            var split = identifier.split("\\.");
-            var libraryName = split[0];
-            var entityName = split[1];
+            var onStatusInfo = TypeUtility.getOnStatus(addingDocItem);
+
+            if (onStatusInfo.onStatus() == TypeUtility.OnStatus.NONE) { // Should never happen, but just to check
+                LOGGER.warn("Got an on status of NONE, something bad is being included in addExtensionFunctions");
+                continue;
+            }
             
             var entityDocOptional = entityDocs.stream().filter(docItem -> {
                 var documentedTypeEntity = (DocumentedTypeEntity) docItem.itemBeingDocumented();
-                return documentedTypeEntity.name().equals(entityName);
+                return documentedTypeEntity.name().equals(onStatusInfo.entityName());
             }).findFirst();
             
             if (entityDocOptional.isEmpty()) {
@@ -176,14 +183,14 @@ public class DocParser {
             var entityDoc = (EntityDoc) entityDocOptional.get().innerDoc();
 
             if (entityDoc.onExtensionFunctions().contains(addingDocItem)) {
-//                LOGGER.debug("Found duplicate in {}:  {}", entityName, FunctionSignatureAttributeTagProcessor.getFunctionSignature(documentedTypeFunction));
+                LOGGER.debug("Found duplicate in {}:  {}", onStatusInfo.entityName(), FunctionSignatureAttributeTagProcessor.getFunctionSignature(documentedTypeFunction));
                 continue;
             }
             
             entityDoc.addOnExtension(addingDocItem);
         }
     }
-
+    
     private void initDocumentedItems() {
         documentedFiles.stream()
                 .filter(documentedFile -> documentedFile.documentedItems() != null)
@@ -231,6 +238,31 @@ public class DocParser {
         functionDocs.sort((a, b) -> Comparator.comparing((DocumentedItem item) -> ((DocumentedTypeFunction) item.itemBeingDocumented()).onOptional().isPresent())
                 .thenComparing(item -> ((DocumentedTypeFunction) item.itemBeingDocumented()).name())
                 .compare(a, b));
+
+        if (isStd) {
+            TypeUtility.NATIVE_QILLETNI_TYPES.forEach(type -> {
+                var entityDoc = new EntityDoc(new DocDescription(List.of(new DocDescription.DocText("This is a native Qilletni type. TODO: Add native type examples/descriptions")))); // TODO: Add native type examples/descriptions
+                entityDocs.add(new DocumentedItem(new DocumentedTypeEntity(libraryName, "std", type), entityDoc));
+            });
+        }
+
+        entityDocs.sort((a, b) -> {
+            DocumentedTypeEntity entityA = (DocumentedTypeEntity) a.itemBeingDocumented();
+            DocumentedTypeEntity entityB = (DocumentedTypeEntity) b.itemBeingDocumented();
+
+            boolean isANative = TypeUtility.NATIVE_QILLETNI_TYPES.contains(entityA.name());
+            boolean isBNative = TypeUtility.NATIVE_QILLETNI_TYPES.contains(entityB.name());
+
+            if (isANative && isBNative) {
+                return Integer.compare(TypeUtility.NATIVE_QILLETNI_TYPES.indexOf(entityA.name()), TypeUtility.NATIVE_QILLETNI_TYPES.indexOf(entityB.name()));
+            } else if (isANative) {
+                return -1;
+            } else if (isBNative) {
+                return 1;
+            } else {
+                return entityA.name().compareTo(entityB.name());
+            }
+        });
     }
 
     public void writeToCache() {
