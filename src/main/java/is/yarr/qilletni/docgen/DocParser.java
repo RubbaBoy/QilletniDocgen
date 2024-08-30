@@ -1,6 +1,5 @@
 package is.yarr.qilletni.docgen;
 
-import is.yarr.qilletni.api.lang.docs.structure.DocFieldType;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
@@ -8,7 +7,6 @@ import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeEntityConstru
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeField;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
 import is.yarr.qilletni.api.lang.docs.structure.text.DocDescription;
-import is.yarr.qilletni.api.lang.docs.structure.text.DocOnLine;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.ConstructorDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
@@ -19,7 +17,6 @@ import is.yarr.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
 import is.yarr.qilletni.docgen.pages.dialects.entity.EntityDialect;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionDialect;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
-import is.yarr.qilletni.docgen.pages.dialects.utility.LinkFactory;
 import is.yarr.qilletni.docgen.pages.dialects.utility.TypeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +47,8 @@ public class DocParser {
     private final CachedDocHandler cachedDocHandler;
     private final String libraryName;
     private final boolean isStd;
-    
+
+    private final Path outputPath;
     private final List<DocumentedFile> documentedFiles;
     private final List<DocumentedItem> entityDocs;
     private final List<DocumentedItem> functionDocs;
@@ -59,16 +57,24 @@ public class DocParser {
     
     private final List<DocumentedItem> onExtensionDocs;
 
-    public DocParser(CachedDocHandler cachedDocHandler, String libraryName, List<DocumentedFile> documentedFiles) {
+    public DocParser(CachedDocHandler cachedDocHandler, String libraryName, Path outputPath, List<DocumentedFile> documentedFiles) {
         this.cachedDocHandler = cachedDocHandler;
         this.libraryName = libraryName;
         this.isStd = libraryName.equals("std");
+        this.outputPath = outputPath;
         this.documentedFiles = documentedFiles;
         this.entityDocs = new ArrayList<>();
         this.functionDocs = new ArrayList<>();
         this.fieldDocs = new ArrayList<>();
         this.entityConstructors = new HashMap<>();
         this.onExtensionDocs = new ArrayList<>();
+    }
+    
+    public static DocParser createInitializedParser(CachedDocHandler cachedDocHandler, String libraryName, Path outputPath, List<DocumentedFile> documentedFiles) {
+        var docParser = new DocParser(cachedDocHandler, libraryName, outputPath, documentedFiles);
+        docParser.initDocumentedItems();
+        
+        return docParser;
     }
     
     public Path getBasePath() {
@@ -106,7 +112,7 @@ public class DocParser {
     }
     
     public void createIndexFile() throws IOException {
-        initDocumentedItems();
+//        initDocumentedItems();
         
         var context = new Context();
         context.setVariable("libraryName", libraryName);
@@ -117,13 +123,13 @@ public class DocParser {
 
         var templateEngine = createTemplateEngine();
 
-        var outputDir = Files.createDirectories(Paths.get("output").resolve(getBasePath()));
+        var outputDir = Files.createDirectories(outputPath.resolve(getBasePath()));
 
         processAndWrite("templates/library.html", outputDir.resolve("index.html"), templateEngine, context);
     }
 
     public void createEntityFiles() throws IOException {
-        var outputDir = Files.createDirectories(Paths.get("output").resolve(getBasePath())).resolve("entity");
+        var outputDir = Files.createDirectories(outputPath.resolve(getBasePath())).resolve("entity");
         Files.createDirectories(outputDir);
 
         for (DocumentedItem documentedItem : entityDocs) {
@@ -131,6 +137,11 @@ public class DocParser {
             var entityDoc = (EntityDoc) documentedItem.innerDoc();
             
             var path = outputDir.resolve("%s.html".formatted(documentedType.name()));
+            
+            if (documentedType.name().contains("string")) {
+                LOGGER.debug("STRING");
+                LOGGER.debug("entityDoc = {}", entityDoc);
+            }
             
             var context = new Context();
             context.setVariable("libraryName", libraryName);
@@ -263,6 +274,8 @@ public class DocParser {
                 return entityA.name().compareTo(entityB.name());
             }
         });
+
+        addExtendedFunctions(onExtensionDocs);
     }
 
     public void writeToCache() {

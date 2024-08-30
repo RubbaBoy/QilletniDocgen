@@ -23,11 +23,13 @@ public class CachedDocHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedDocHandler.class);
 
+    private final Path outputPath;
     private final Path cachePath;
     // The key is the entity name, the value is a list of functions that reference the entity
     private final Map<String, List<ReferencedOnFunction>> entityFunctionReferences; 
     
-    public CachedDocHandler(Path cachePath) {
+    public CachedDocHandler(Path outputPath, Path cachePath) {
+        this.outputPath = outputPath;
         this.cachePath = cachePath;
         this.entityFunctionReferences = new HashMap<>();
     }
@@ -66,7 +68,7 @@ public class CachedDocHandler {
         try (var documentationDeserializer = new DocumentationDeserializer(Files.newInputStream(libraryCachePath))) {
             var documentedFiles = documentationDeserializer.deserializeDocumentedFileList();
 
-            return Optional.of(new DocParser(this, libraryName, documentedFiles));
+            return Optional.of(DocParser.createInitializedParser(this, libraryName, outputPath, documentedFiles));
         }
     }
 
@@ -128,6 +130,7 @@ public class CachedDocHandler {
 
     private Optional<Path> getLibraryCache(String libraryName) {
         var resolved = cachePath.resolve(libraryName + ".cache");
+        LOGGER.debug("Checking for cache file: {}", resolved);
         if (Files.exists(resolved)) {
             return Optional.of(resolved);
         }

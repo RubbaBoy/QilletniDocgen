@@ -18,12 +18,12 @@ public class DocParserFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocParserFactory.class);
 
-    public static Optional<DocParser> createDocParserFromCache(String libraryName, Path cachePath) {
-        var cachedDocParserHandler = new CachedDocHandler(cachePath);
+    public static Optional<DocParser> createDocParserFromCache(String libraryName, Path outputPath, Path cachePath) {
+        var cachedDocParserHandler = new CachedDocHandler(outputPath, cachePath);
         return cachedDocParserHandler.getCachedLibrayDocParser(libraryName);
     }
 
-    public static DocParser createDocParser(String libraryName, Path input, Path cachePath) {
+    public static DocParser createDocParser(String libraryName, Path input, Path outputPath, Path cachePath) {
         try {
             if (Files.notExists(cachePath)) {
                 Files.createDirectories(cachePath);
@@ -33,13 +33,7 @@ public class DocParserFactory {
             throw new UncheckedIOException(e);
         }
 
-        var cachedDocParserHandler = new CachedDocHandler(cachePath);
-
-        var cachedParserOptional = cachedDocParserHandler.getCachedLibrayDocParser(libraryName);
-
-        if (cachedParserOptional.isPresent()) {
-            return cachedParserOptional.get();
-        }
+        var cachedDocParserHandler = new CachedDocHandler(outputPath, cachePath);
 
         var documentedFiles = new ArrayList<DocumentedFile>();
 
@@ -69,6 +63,6 @@ public class DocParserFactory {
             System.out.println(documentedFile + "\n");
         }
 
-        return new DocParser(cachedDocParserHandler, libraryName, documentedFiles);
+        return DocParser.createInitializedParser(cachedDocParserHandler, libraryName, outputPath, documentedFiles);
     }
 }

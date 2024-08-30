@@ -5,4 +5,6 @@ module QilletniDocgen.main {
     requires org.slf4j;
     requires unbescape;
     requires msgpack.core;
+    
+    exports is.yarr.qilletni.docgen;
 }
