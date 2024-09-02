@@ -78,6 +78,7 @@ public class DocumentationSerializer implements AutoCloseable {
                 serializeParamNameList(documentedTypeFunction.params());
                 
                 packer.packBoolean(documentedTypeFunction.isNative());
+                packer.packBoolean(documentedTypeFunction.isStatic());
                 
                 if (documentedTypeFunction.onOptional().isPresent()) {
                     packer.packString(documentedTypeFunction.onOptional().get());

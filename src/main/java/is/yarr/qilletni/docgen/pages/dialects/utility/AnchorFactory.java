@@ -9,8 +9,9 @@ import java.nio.charset.Charset;
 public class AnchorFactory {
 
     public static String createAnchorForFunction(DocumentedTypeFunction documentedFunction) {
-        var body = "%sfun %s(%s)%s".formatted(
+        var body = "%s%sfun %s(%s)%s".formatted(
                 documentedFunction.isNative() ? "native " : "",
+                documentedFunction.isStatic() ? "static " : "",
                 documentedFunction.name(),
                 String.join(", ", documentedFunction.params()),
                 documentedFunction.onOptional().map(" on %s"::formatted).orElse("")

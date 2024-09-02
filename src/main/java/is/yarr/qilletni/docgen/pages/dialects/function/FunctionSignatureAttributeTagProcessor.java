@@ -49,8 +49,9 @@ public class FunctionSignatureAttributeTagProcessor extends AbstractAttributeTag
     
     // TODO: Move out?
     public static String getFunctionSignature(DocumentedTypeFunction documentedFunction) {
-        return "%sfun %s(%s)%s".formatted(
+        return "%s%sfun %s(%s)%s".formatted(
                 documentedFunction.isNative() ? "native " : "",
+                documentedFunction.isStatic() ? "static " : "",
                 documentedFunction.name(),
                 String.join(", ", documentedFunction.params()),
                 documentedFunction.onOptional().map(" on %s"::formatted).orElse("")

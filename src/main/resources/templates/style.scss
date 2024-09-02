@@ -78,6 +78,10 @@ p {
                     padding: 0.5em;
                 }
 
+                td:last-of-type {
+                    color: #474747;
+                }
+
                 table {
                     width: 100%;
                     border-collapse: collapse;
@@ -115,6 +119,10 @@ p {
 
         td, th {
             padding: 0.5em;
+        }
+
+        td:last-of-type {
+            color: #474747;
         }
 
         table {

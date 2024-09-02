@@ -107,6 +107,7 @@ public class DocumentationDeserializer implements AutoCloseable {
                 var name = unpacker.unpackString();
                 var params = deserializeParamNames();
                 var isNative = unpacker.unpackBoolean();
+                var isStatic = unpacker.unpackBoolean();
 
                 var onType = Optional.<String>empty();
                 
@@ -114,7 +115,7 @@ public class DocumentationDeserializer implements AutoCloseable {
                     onType = Optional.of(unpacker.unpackString());
                 }
 
-                yield new DocumentedTypeFunction(libraryName, importPath, name, params, isNative, onType);
+                yield new DocumentedTypeFunction(libraryName, importPath, name, params, isNative, isStatic, onType);
             }
             default -> throw new IllegalArgumentException("Invalid index: " + index);
         };

@@ -74,6 +74,9 @@ p {
 .library-sections .category-column .library-category .category-list td {
   padding: 0.5em;
 }
+.library-sections .category-column .library-category .category-list td:last-of-type {
+  color: #474747;
+}
 .library-sections .category-column .library-category .category-list table {
   width: 100%;
   border-collapse: collapse;
@@ -100,6 +103,9 @@ p {
 }
 .doc-overview .doc-overview-container td, .doc-overview .doc-overview-container th {
   padding: 0.5em;
+}
+.doc-overview .doc-overview-container td:last-of-type {
+  color: #474747;
 }
 .doc-overview .doc-overview-container table {
   width: 100%;
