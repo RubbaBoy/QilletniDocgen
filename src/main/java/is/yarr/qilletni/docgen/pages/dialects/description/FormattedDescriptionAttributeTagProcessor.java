@@ -10,8 +10,7 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.standard.expression.StandardExpressions;
 import org.thymeleaf.templatemode.TemplateMode;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class FormattedDescriptionAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
@@ -43,18 +42,24 @@ public class FormattedDescriptionAttributeTagProcessor extends AbstractAttribute
         
         if (executed == null) return;
         
-        if (!(executed instanceof DocDescription docDescription)) {
+        if (!(executed instanceof DocDescription(List<DocDescription.DescriptionItem> descriptionItems))) {
             throw new RuntimeException("Expected a DocDescription, got " + executed);
         }
 
         var modelFactory = context.getModelFactory();
-        var model = modelFactory.createModel();
         
-        for (DocDescription.DescriptionItem descriptionItem : docDescription.descriptionItems()) {
-            LinkFactory.createDescriptionLinkToType(modelFactory, model, descriptionItem);
-        }
+        var outerModel = modelFactory.createModel();
+        outerModel.add(modelFactory.createOpenElementTag("div", "class", "markdown-description"));
+        
+        var innerModel = modelFactory.createModel();
+        
+        var messageCreator = new MessageCreator(modelFactory, innerModel, descriptionItems);
+        messageCreator.processMessage();
 
-        structureHandler.setBody(model, false);
+        outerModel.addModel(innerModel);
+        outerModel.add(modelFactory.createCloseElementTag("div"));
+
+        structureHandler.setBody(outerModel, false);
     }
     
     

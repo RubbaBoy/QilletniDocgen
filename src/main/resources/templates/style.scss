@@ -1,269 +1,201 @@
-@font-face {
-    src: url('/output/fonts/DejaVuSerif.ttf') format('truetype');
-    src: url('/fonts/DejaVuSansMono.ttf') format('truetype');
-    src: url('/fonts/DejaVuSans.ttf') format('truetype');
-}
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
 
 :root {
-    --primary-font-family: 'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
-    --mono-font-family: 'DejaVu Sans Mono', monospace;
-    --sans-font-family: 'DejaVu Sans';
+    --primary-font-family: 'Roboto', sans-serif;
+    --mono-font-family: 'Roboto Mono', monospace;
+    --sans-font-family: 'Roboto', sans-serif;
     --function-padding: 0.5em;
 }
 
+/* Override body from Materialize if you prefer your custom font */
 body {
     background: #f8f8f8;
-}
-
-span, p, a, td, th, h1, h2, h3, h4, h5, h6 {
     font-family: var(--primary-font-family), serif;
 }
 
+/* Materialize typically sets .brand-logo font in Roboto, 
+   so override if you want a different look: */
+.brand-logo {
+    font-family: var(--sans-font-family), sans-serif;
+}
+
+/* Keep your code block styling if desired */
 .code {
     font-family: var(--mono-font-family), monospace;
+    color: #37474f; /* subtle dark color for code text */
 }
 
-p {
-    color: #474747;
-    line-height: 1.4;
-}
-
-.header {
-    border-bottom: gray;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-}
-
-.pure-menu-link {
-    padding: 1em .7em;
-}
-
-.content-container {
-    justify-content: center;
-}
-
+/* Titles, headings, paragraphs, etc. */
 .library-title {
     margin-bottom: 0.25em;
+    font-family: var(--sans-font-family), sans-serif;
 }
 
 .library-version {
     opacity: 0.8;
     margin-left: 0.5em;
+    font-size: 0.9em;
 }
 
 .page-description {
-    margin-top: 2em;
-    margin-bottom: 1em;
-}
-
-.library-description > p {
-    margin-bottom: 0;
-}
-
-.library-sections {
-    .category-column {
-        padding: 0 2em;
-
-        .library-category {
-            margin-top: 3em;
-
-            .content-subhead {
-                margin-bottom: 1em;
-            }
-
-            .category-list {
-                padding-left: 1em;
-
-                td {
-                    padding: 0.5em;
-                }
-
-                td:last-of-type {
-                    color: #474747;
-                }
-
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    border: thin solid #ddd;
-                }
-
-                tr:nth-child(odd) {
-                    background-color: #f2f2f2;
-                }
-            }
-        }
-    }
-}
-
-//.constructor-definitions {
-//    flex-direction: column;
-//    width: 100%;
-//}
-
-.function-definitions, .constructor-definitions, .doc-overview {
-    flex-direction: column;
-    width: 100%;
     margin-top: 1em;
-    
-    & > h3 {
-        margin-bottom: 0;
-    }
+    margin-bottom: 2em;
+    color: #474747;
+    line-height: 1.4;
 }
 
-.doc-overview {
-    display: flex;
+/* Category sections in cards */
+.library-category {
+    margin-top: 2em;
 
-    .doc-overview-container {
-        margin-top: 1em;
+    .card-title.content-subhead {
+        font-family: var(--sans-font-family), sans-serif;
+        font-weight: 600;
+        margin-bottom: 1em;
+    }
 
-        td, th {
+    .category-list {
+        table.striped {
+            width: 100%;
+        }
+        td {
             padding: 0.5em;
         }
-
         td:last-of-type {
             color: #474747;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: thin solid #ddd;
-        }
-
-        .left-column {
-            min-width: 25%;
-            width: 25%;
-            white-space: nowrap;
-            font-weight: 700;
-            
-            .from-extension {
-                margin-left: 1em;
-                font-size: 0.9em;
-                color: #474747;
-
-                &:hover {
-                    color: #bb7a2a;
-                }
-            }
-        }
-
-        tr:nth-child(odd):not(.overview-header) {
-            background-color: #f2f2f2;
-        }
-
-        .overview-header {
-            background-color: #dee3e9;
-            text-align: left;
         }
     }
 }
 
 .function-doc {
-    width: 100%;
-    background: white;
-    margin-top: 1em;
+    margin-top: 2em;
 
-    .from-extension {
-        margin-left: 1em;
-        font-size: 0.8em;
-        color: #474747;
+    .card-content {
+        position: relative; // so we can position the anchor link more easily if desired
 
-        &:hover {
-            color: #bb7a2a;
+        .card-title {
+            margin-bottom: 0.25em;
+            font-weight: 600; // override to your taste
+            font-family: var(--sans-font-family), sans-serif;
         }
-    }
-
-    .function-signature {
-        background: #dee3e9;
-        padding: var(--function-padding);
-        font-family: var(--sans-font-family), monospace;
-        font-weight: 700;
-        line-height: 1.5;
 
         .function-anchor {
-            display: none;
-            color: black;
-            opacity: 0.5;
-            padding-left: 0.25em;
-            line-height: 1.5;
-        }
+            position: absolute;
+            top: 0.5em;
+            right: 0.5em;
+            color: #424242;
 
-        &:hover {
-            .function-anchor {
-                display: inline;
+            i.material-icons {
+                vertical-align: middle;
+            }
 
-                &:hover {
-                    opacity: 0.3;
-                }
+            &:hover {
+                color: #bb7a2a; // or your chosen hover color
             }
         }
     }
 
-    .function-innerdoc {
-        padding: 0 var(--function-padding);
+    /* If you want a distinct styling for the param list or code blocks: */
+    code {
+        font-family: var(--mono-font-family), monospace;
+        background-color: #f5f5f5;
+        padding: 0.1em 0.3em;
+        border-radius: 4px;
+    }
 
-        .function-param-container {
-            .param-name {
-                /*font-weight: 700;*/
-                font-family: var(--mono-font-family), monospace;
-                padding-right: 0.25em;
-            }
+    /* Example of customizing headings like “Parameters,” “Errors,” etc. */
+    .function-params,
+    .function-return,
+    .function-error-title {
+        display: block;
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+        font-weight: 600;
+        color: #455a64; // a dark grey-blue from Material palette
+    }
 
-            .param-type {
-                padding-right: 0.25em;
-                font-size: 10pt;
-                color: #bb7a2a;
-            }
-
-            .param-description::before {
-                content: "-";
-                padding-right: 0.5em;
-                position: relative;
-            }
-        }
-
-        .function-return-container {
-            .return-type {
-                padding-left: 0.25em;
-                font-size: 10pt;
-                color: #bb7a2a;
-            }
-        }
+    ul.browser-default {
+        list-style-type: disc;
+        margin-left: 1.5em;
     }
 }
 
-.function-params, .function-return, .function-on, .function-error-title {
-    font-weight: 700;
-}
 
-.footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #f1f1f1;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    border-top: 1px solid #ccc;
-    margin-top: 2em;
-    
-    p {
+/* Footer styling override to match Materialize theme if you like. */
+.page-footer {
+    .container p {
         margin: 0;
         font-size: 0.9em;
-        color: #333;
+        color: #fff; /* text color for light footers on teal background */
     }
 }
 
+/* Link hover color override (Materialize typically sets purple) */
 a {
-    line-height: 1.75;
+    color: #1565c0;
     text-decoration: none;
-    color: #2929b7;
-
-    &:visited {
-        color: #2929b7;
-    }
 
     &:hover {
         color: #bb7a2a;
+    }
+}
+
+/* Add padding/margin to anchor icon in card headers */
+.function-anchor {
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Example override so param lines remain on one line (no <br>), 
+   we remove them below in the HTML but just to ensure 
+   the type doesn't break into next line. */
+td.code-param {
+    white-space: nowrap; /* Keep code param + type together */
+    padding: 0.5rem 1rem 0.5rem 0;
+}
+
+td.param-desc {
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.param-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+.library-sections {
+    margin-top: 1.5rem;
+
+    .category-column {
+        padding: 0 1rem; // or however much spacing you'd like
+    }
+}
+
+.l-box.library-category {
+    margin-bottom: 1.5rem;
+
+    .content-subhead {
+        margin-bottom: 1rem;
+        font-family: var(--sans-font-family), sans-serif;
+        font-weight: 600;
+    }
+}
+
+// Stupid but it makes it more specific to override materialize's CSS for `.card .card-content p`
+.markdown-description.markdown-description.markdown-description {
+    p {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        
+        &:first-of-type {
+            margin-top: 0;
+        }
+        
+        &:last-of-type {
+            margin-bottom: 0;
+        }
     }
 }

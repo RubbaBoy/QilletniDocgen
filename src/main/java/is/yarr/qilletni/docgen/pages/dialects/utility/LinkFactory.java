@@ -2,6 +2,7 @@ package is.yarr.qilletni.docgen.pages.dialects.utility;
 
 import is.yarr.qilletni.api.lang.docs.structure.DocFieldType;
 import is.yarr.qilletni.api.lang.docs.structure.text.DocDescription;
+import is.yarr.qilletni.docgen.markdown.MarkdownParser;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -9,36 +10,13 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class LinkFactory {
     
-    private static final String JAVA_DOC_BASE_URL = "https://docs.oracle.com/en/java/javase/21/docs/api/";
+    public static final String JAVA_DOC_BASE_URL = "https://docs.oracle.com/en/java/javase/21/docs/api/";
     private static final Map<String, String> MODULE_MAP = new HashMap<>();
-    
-    public static void createDescriptionLinkToType(IModelFactory modelFactory, IModel model, DocDescription.DescriptionItem descriptionItem) {
-        switch (descriptionItem) {
-            case DocDescription.DocText docText -> model.add(modelFactory.createText(docText.text()));
-            case DocDescription.JavaRef javaRef -> {
-                model.add(modelFactory.createOpenElementTag("a", Map.of("href", generateJavadocLink(javaRef.javaName()), "target", "_blank"), AttributeValueQuotes.DOUBLE, false));
-                model.add(modelFactory.createText(" %s ".formatted(getNameFromClass(javaRef.javaName()))));
-                model.add(modelFactory.createCloseElementTag("a"));
-            }
-            case DocDescription.ParamRef paramRef -> {
-                model.add(modelFactory.createOpenElementTag("i"));
-                model.add(modelFactory.createText(" %s ".formatted(URLEncoder.encode(paramRef.paramName(), Charset.defaultCharset()))));
-                model.add(modelFactory.createCloseElementTag("i"));
-            }
-            case DocDescription.TypeRef typeRef -> {
-                model.add(modelFactory.createOpenElementTag("a", "href", generateQilletniTypeLink(typeRef.typeName())));
-                model.add(modelFactory.createText(" %s ".formatted(URLEncoder.encode(getNameFromQilletniType(typeRef.typeName()), Charset.defaultCharset()))));
-                model.add(modelFactory.createCloseElementTag("a"));
-            }
-        }
-    }
     
     public static void populateTypeLink(IElementTagStructureHandler structureHandler, DocFieldType docFieldType) {
         var identifier = docFieldType.identifier();
@@ -56,12 +34,12 @@ public class LinkFactory {
         }
     }
 
-    private static String getNameFromClass(String fullyQualifiedClassName) {
+    public static String getNameFromClass(String fullyQualifiedClassName) {
         var split = fullyQualifiedClassName.split("\\.");
         return split[split.length - 1];
     }
 
-    private static String generateJavadocLink(String fullyQualifiedClassName) {
+    public static String generateJavadocLink(String fullyQualifiedClassName) {
         if (fullyQualifiedClassName == null || fullyQualifiedClassName.isEmpty()) {
             throw new IllegalArgumentException("Class name cannot be null or empty");
         }
@@ -86,12 +64,12 @@ public class LinkFactory {
         return JAVA_DOC_BASE_URL + moduleName + "/" + path + ".html";
     }
 
-    private static String getNameFromQilletniType(String qilletniType) {
+    public static String getNameFromQilletniType(String qilletniType) {
         var split = qilletniType.split("\\.");
         return split[split.length - 1];
     }
 
-    private static String generateQilletniTypeLink(String qilletniTypeString) {
+    public static String generateQilletniTypeLink(String qilletniTypeString) {
         if (TypeUtility.isNativeType(qilletniTypeString)) {
             return generateQilletniTypeLink("std", qilletniTypeString);
         }
@@ -110,6 +88,7 @@ public class LinkFactory {
 
     static {
         // Core Java Modules
+        MODULE_MAP.put("java.net.http", "java.net.http");
         MODULE_MAP.put("java.lang", "java.base");
         MODULE_MAP.put("java.io", "java.base");
         MODULE_MAP.put("java.math", "java.base");
@@ -224,5 +203,5 @@ public class LinkFactory {
         MODULE_MAP.put("javax.xml.transform.stax", "java.xml");
         MODULE_MAP.put("javax.xml.transform.stream", "java.xml");
     }
-    
+
 }

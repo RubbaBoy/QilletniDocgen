@@ -1,0 +1,68 @@
+<!-- functionCard.html -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:function="http://www.w3.org/1999/xhtml"
+      xmlns:formatteddoc="http://www.w3.org/1999/xhtml">
+
+<div th:fragment="functionCard(documentedFunction)" class="card function-doc hoverable">
+    <!-- Card header / signature -->
+    <div class="card-content teal lighten-4 function-signature"
+         function:anchor="${documentedFunction.itemBeingDocumented()}">
+        <span class="code" function:signature="${documentedFunction.itemBeingDocumented()}"></span>
+        <a class="function-anchor right"
+           function:link="${documentedFunction.itemBeingDocumented()}">
+            <i class="material-icons">link</i>
+        </a>
+    </div>
+
+    <!-- Card body -->
+    <div class="card-content function-innerdoc">
+        <p formatteddoc:desc="${documentedFunction.innerDoc().description()}"></p>
+
+        <!-- Params -->
+        <div th:if="${!documentedFunction.innerDoc().paramDocs().isEmpty()}"
+             class="function-param-container" style="margin-top:1rem;">
+            <span class="function-params" style="font-weight:600;">Params</span>
+            <table class="param-table">
+                <tbody>
+                <tr th:each="param : ${documentedFunction.innerDoc().paramDocs()}"
+                    style="vertical-align: top;">
+                    <td class="code-param">
+                        <code th:text="${param.name()}"></code>
+                        <span th:if="${param.docFieldType() != null}">
+                            (<a function:paramtype="${param.docFieldType()}"></a>)
+                        </span>
+                    </td>
+                    <td class="param-desc">
+                        <span formatteddoc:desc="${param.description()}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Returns -->
+        <div th:if="${documentedFunction.innerDoc().returnDoc() != null}"
+             class="function-return-container">
+            <span class="function-params">
+                Returns
+                <a th:if="${documentedFunction.innerDoc().returnDoc().docFieldType() != null}"
+                   function:paramtype="${documentedFunction.innerDoc().returnDoc().docFieldType()}"
+                   class="return-type"></a>
+            </span>
+            <p formatteddoc:desc="${documentedFunction.innerDoc().returnDoc().description()}"></p>
+        </div>
+
+        <!-- Errors -->
+        <div th:if="${documentedFunction.innerDoc().docErrors() != null}">
+            <span class="function-params">Errors</span>
+            <p formatteddoc:desc="${documentedFunction.innerDoc().docErrors().description()}"></p>
+        </div>
+
+        <!-- On line (if extension) -->
+        <div th:if="${documentedFunction.innerDoc().docOnLine() != null}">
+            <span class="function-params">On</span>
+            <p formatteddoc:desc="${documentedFunction.innerDoc().docOnLine().description()}"></p>
+        </div>
+    </div>
+</div>
+</html>
