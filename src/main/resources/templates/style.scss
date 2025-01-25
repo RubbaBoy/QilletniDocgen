@@ -199,3 +199,74 @@ td.param-desc {
         }
     }
 }
+
+.landing-page {
+    // If you wrap the main container in a class="landing-page", you can do:
+    margin-top: 2rem;
+
+    h2.library-title {
+        margin-bottom: 0.25em;
+    }
+
+    .page-description {
+        margin-bottom: 2em;
+        color: #474747;
+        line-height: 1.4;
+    }
+}
+
+.content-subhead {
+    font-family: var(--sans-font-family), sans-serif;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.nav-search {
+    .search-icon {
+        top: unset;
+    }
+}
+
+#search-popup {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    max-width: 400px;
+    z-index: 999;
+}
+
+#search-popup {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    max-width: 400px;
+    z-index: 999;
+    display: none;
+}
+
+#search-results-list {
+    margin: 0;
+    
+    .collection-item {
+        cursor: pointer;
+        
+        &:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            
+            .result-description {
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            
+            .result-file {
+                margin-left: 0.25em;
+            }
+        }
+    }
+}
