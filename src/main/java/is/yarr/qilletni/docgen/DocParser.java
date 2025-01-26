@@ -11,6 +11,8 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.ConstructorDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
+import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
+import is.yarr.qilletni.docgen.cache.BasicQllData;
 import is.yarr.qilletni.docgen.cache.CachedDocHandler;
 import is.yarr.qilletni.docgen.index.SearchIndexGenerator;
 import is.yarr.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
@@ -47,6 +49,7 @@ public class DocParser {
 
     private final CachedDocHandler cachedDocHandler;
     private final String libraryName;
+    private final BasicQllData basicQllData;
     private final boolean isStd;
 
     private final Path outputPath;
@@ -60,9 +63,10 @@ public class DocParser {
     private final Path fullIndexPath;
     private final String relativeIndexPath;
 
-    public DocParser(CachedDocHandler cachedDocHandler, String libraryName, Path outputPath, List<DocumentedFile> documentedFiles) {
+    public DocParser(CachedDocHandler cachedDocHandler, BasicQllData basicQllData, Path outputPath, List<DocumentedFile> documentedFiles) {
         this.cachedDocHandler = cachedDocHandler;
-        this.libraryName = libraryName;
+        this.libraryName = basicQllData.name();
+        this.basicQllData = basicQllData;
         this.isStd = libraryName.equals("std");
         this.outputPath = outputPath;
         this.documentedFiles = documentedFiles;
@@ -76,8 +80,8 @@ public class DocParser {
         this.relativeIndexPath = "/" + getBasePath().resolve("index.json").toString().replace("\\", "/");
     }
     
-    public static DocParser createInitializedParser(CachedDocHandler cachedDocHandler, String libraryName, Path outputPath, List<DocumentedFile> documentedFiles) {
-        var docParser = new DocParser(cachedDocHandler, libraryName, outputPath, documentedFiles);
+    public static DocParser createInitializedParser(CachedDocHandler cachedDocHandler, BasicQllData basicQllData, Path outputPath, List<DocumentedFile> documentedFiles) {
+        var docParser = new DocParser(cachedDocHandler, basicQllData, outputPath, documentedFiles);
         docParser.initDocumentedItems();
         
         return docParser;
@@ -117,11 +121,12 @@ public class DocParser {
         }
     }
     
-    public void createIndexFile() throws IOException {
+    public void createLibraryIndesPage() throws IOException {
 //        initDocumentedItems();
         
         var context = new Context();
         context.setVariable("libraryName", libraryName);
+        context.setVariable("library", basicQllData);
         context.setVariable("entityDocs", entityDocs);
         context.setVariable("functionDocs", functionDocs);
         context.setVariable("fieldDocs", fieldDocs);
@@ -135,7 +140,7 @@ public class DocParser {
         processAndWrite("templates/library.html", outputDir.resolve("index.html"), templateEngine, context);
     }
 
-    public void createEntityFiles() throws IOException {
+    public void createEntityPages() throws IOException {
         var outputDir = Files.createDirectories(outputPath.resolve(getBasePath())).resolve("entity");
         Files.createDirectories(outputDir);
 
@@ -152,6 +157,7 @@ public class DocParser {
             
             var context = new Context();
             context.setVariable("libraryName", libraryName);
+            context.setVariable("library", basicQllData);
             context.setVariable("fileName", documentedType.importPath());
             context.setVariable("name", documentedType.name());
             context.setVariable("description", entityDoc.description());
@@ -298,6 +304,10 @@ public class DocParser {
 
     public void writeToCache() {
         cachedDocHandler.writeLibraryCache(this);
+    }
+
+    public BasicQllData getBasicQll() {
+        return basicQllData;
     }
 
     public List<DocumentedItem> getOnExtensionDocs() {

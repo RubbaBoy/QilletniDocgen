@@ -3,6 +3,9 @@ package is.yarr.qilletni.docgen;
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedItem;
 import is.yarr.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
+import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
+import is.yarr.qilletni.docgen.cache.BasicQllData;
+import is.yarr.qilletni.docgen.pages.GlobalIndexPageGenerator;
 import is.yarr.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
 import is.yarr.qilletni.docgen.pages.dialects.utility.TypeUtility;
 import org.slf4j.Logger;
@@ -17,19 +20,33 @@ import java.util.stream.Collectors;
 public class DocGenerator {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DocGenerator.class);
+    
+    private final Path cachePath;
+    private final Path outputPath;
+
+    /**
+     * Creates a {@link DocGenerator} that can generate documentation for libraries.
+     * 
+     * @param cachePath   The directory containing documentation cache
+     * @param outputPath  The path to output the generated documentation to
+     */
+    public DocGenerator(Path cachePath, Path outputPath) {
+        this.cachePath = cachePath;
+        this.outputPath = outputPath;
+    }
 
     /**
      * Generates documentation for the given Qilletni project input path.
      *
-     * @param outputPath  The path to output the generated documentation to
-     * @param cachePath   The directory containing documentation cache
      * @param inputPath   The qilletni-src directory of the Qilletni project being documented
-     * @param libraryName The name of the library to generate documentation for
+     * @param libraryQll  The library to generate documentation for
      */
-    public void generateDocs(Path outputPath, Path cachePath, Path inputPath, String libraryName) throws IOException {
-        LOGGER.info("Generating docs for library: {}", libraryName);
+    public void generateDocs(Path inputPath, QilletniInfoData libraryQll) throws IOException {
+        LOGGER.info("Generating docs for library: {}", libraryQll.name());
+        
+        var basicQllData = new BasicQllData(libraryQll);
 
-        processLibrary(libraryName, inputPath, outputPath, cachePath).stream()
+        processLibrary(basicQllData, inputPath, outputPath, cachePath).stream()
                 .filter(docItem -> docItem instanceof DocumentedItem(DocumentedTypeFunction _, FunctionDoc _))
                 .collect(Collectors.groupingBy(TypeUtility::getOnStatus)).forEach((onStatusInfo, items) -> {
                     var cachedLibraryName = onStatusInfo.libraryName();
@@ -57,12 +74,17 @@ public class DocGenerator {
                     }
                 });
     }
+    
+    public void regenerateGlobalIndex() throws IOException {
+        var globalIndexPageGenerator = new GlobalIndexPageGenerator(cachePath, outputPath);
+        globalIndexPageGenerator.generateIndex();
+    }
 
-    private static List<DocumentedItem> processLibrary(String libraryName, Path libraryPath, Path outputPath, Path cachePath) throws IOException {
-        var docParser = DocParserFactory.createDocParser(libraryName, libraryPath, outputPath, cachePath);
+    private static List<DocumentedItem> processLibrary(BasicQllData basicQllData, Path libraryPath, Path outputPath, Path cachePath) throws IOException {
+        var docParser = DocParserFactory.createDocParser(basicQllData, libraryPath, outputPath, cachePath);
 
-        docParser.createIndexFile();
-        docParser.createEntityFiles();
+        docParser.createLibraryIndesPage();
+        docParser.createEntityPages();
         docParser.writeToCache();
         docParser.createSearchIndex();
 
@@ -78,9 +100,9 @@ public class DocGenerator {
         
         var docParser = docParserOptional.get();
 
-        docParser.createIndexFile();
+        docParser.createLibraryIndesPage();
         docParser.addExtendedFunctions(onExtensionsDocs);
-        docParser.createEntityFiles();
+        docParser.createEntityPages();
         docParser.writeToCache();
     }
 }

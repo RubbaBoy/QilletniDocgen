@@ -63,12 +63,10 @@ public class CachedDocHandler {
     }
     
     private Optional<DocParser> readDocParserFromCache(Path libraryCachePath) throws Exception {
-        var libraryName = libraryCachePath.getFileName().toString().replaceAll("\\.cache$", "");
-        
         try (var documentationDeserializer = new DocumentationDeserializer(Files.newInputStream(libraryCachePath))) {
-            var documentedFiles = documentationDeserializer.deserializeDocumentedFileList();
+            var deserializedLibrary = documentationDeserializer.deserializeLibrary();
 
-            return Optional.of(DocParser.createInitializedParser(this, libraryName, outputPath, documentedFiles));
+            return Optional.of(DocParser.createInitializedParser(this, deserializedLibrary.basicQllData(), outputPath, deserializedLibrary.documentedFiles()));
         }
     }
 
@@ -82,7 +80,7 @@ public class CachedDocHandler {
 
         try (var outputStream = Files.newOutputStream(cacheDestinationFile);
              var documentationSerializer = new DocumentationSerializer(outputStream)) {
-            documentationSerializer.serializeDocumentedFileList(docParser.getDocumentedFiles());
+            documentationSerializer.serializeLibrary(docParser.getBasicQll(), docParser.getDocumentedFiles());
 
             LOGGER.debug("Wrote {} bytes to cache file: {}", documentationSerializer.getTotalWrittenBytes(), cacheDestinationFile.getFileName());
         } catch (Exception e) {

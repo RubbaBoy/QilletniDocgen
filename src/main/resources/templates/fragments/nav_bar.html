@@ -1,0 +1,37 @@
+<!-- File: templates/fragments/navbar.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="navBar(libraryName, enableSearch)">
+    <nav class="teal">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo" style="margin-left: 1rem;">Qilletni Docs</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+
+                <li th:if="${enableSearch}">
+                    <!-- Search form: style with Materialize or custom CSS -->
+                    <form onsubmit="return false;" class="nav-search">
+                        <div class="input-field">
+                            <i class="material-icons prefix search-icon">search</i>
+                            <input id="search-input" type="text" placeholder="Search docs..." required>
+                        </div>
+                    </form>
+                </li>
+
+                <li><a href="/">All Libraries</a></li>
+                <li th:if="${libraryName != null}">
+                    <a th:href="${'/library/' + libraryName + '/'}" th:text="${libraryName}">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div th:if="${enableSearch}" id="search-popup" class="card" style="display: none;">
+        <ul id="search-results-list" class="collection" style="margin: 0;"></ul>
+    </div>
+</th:block>
+
+</body>
+</html>

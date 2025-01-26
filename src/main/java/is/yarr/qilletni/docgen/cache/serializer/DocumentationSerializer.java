@@ -18,6 +18,7 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.InnerDoc;
+import is.yarr.qilletni.docgen.cache.BasicQllData;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessagePacker;
 
@@ -31,6 +32,11 @@ public class DocumentationSerializer implements AutoCloseable {
     
     public DocumentationSerializer(OutputStream outputStream) {
         packer = MessagePack.newDefaultPacker(outputStream);
+    }
+    
+    public void serializeLibrary(BasicQllData basicQllData, List<DocumentedFile> documentedFiles) throws IOException {
+        serializeBasicQllData(basicQllData);
+        serializeDocumentedFileList(documentedFiles);
     }
     
     public void serializeDocumentedFileList(List<DocumentedFile> documentedFiles) throws IOException {
@@ -217,6 +223,13 @@ public class DocumentationSerializer implements AutoCloseable {
     private void packNilPlaceholder(NilPlaceholder nilPlaceholder) throws IOException {
         packer.packNil();
         packer.packInt(nilPlaceholder.ordinal());
+    }
+    
+    public void serializeBasicQllData(BasicQllData basicQllData) throws IOException {
+        packer.packString(basicQllData.name());
+        packer.packString(basicQllData.version());
+        packer.packString(basicQllData.author());
+        packer.packString(basicQllData.description());
     }
 
     public enum NilPlaceholder {

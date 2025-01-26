@@ -30,10 +30,10 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
 
-    implementation 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT'
-    implementation 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT:sources'
+    compileOnly 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT'
+    compileOnly 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT:sources'
 
-    implementation 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
+    compileOnly 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
 
     // For markdown parsing
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'

@@ -22,17 +22,7 @@
 </head>
 <body>
 
-<!-- Materialize Navbar -->
-<nav class="teal">
-    <div class="nav-wrapper">
-        <a href="#" class="brand-logo" style="margin-left: 1rem;">Qilletni Docs</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li class="active"><a href="#">Overview</a></li>
-            <li><a href="#">Library</a></li>
-            <li><a href="#">Entity</a></li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{templates/fragments/nav_bar :: navBar(${libraryName}, false)}"></div>
 
 <!-- Main container -->
 <div class="container" style="margin-top: 2rem;">
@@ -57,30 +47,36 @@
             <div class="card hoverable">
                 <div class="card-content">
                     <h4 class="content-subhead">Available Libraries</h4>
-                    <table class="highlight responsive-table">
+                    <table class="library-list highlight responsive-table">
                         <thead>
                         <tr class="overview-header">
-                            <th>Library</th>
-                            <th>Description</th>
+                            <th class="library-name">Library</th>
+                            <th class="library-version">Version</th>
+                            <th class="library-author">Author</th>
+                            <th class="library-description">Description</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="lib : ${libraries}">
-                            <td>
-                                <!-- e.g. /library/{libraryName}/index.html -->
-                                <a th:href="@{/library/{libName}/index.html(libName=${lib.name()})}"
+                            <td class="library-name">
+                                <a th:href="${'/library/' + lib.name() + '/'}"
                                    th:text="${lib.name()}">
                                 </a>
                             </td>
-                            <td>
-                                <!-- Library Description -->
+                            <td class="library-version">
+                                <span th:text="'v' + ${lib.version()}"></span>
+                            </td>
+                            <td class="library-author">
+                                <span th:text="${lib.author()}"></span>
+                            </td>
+                            <td class="library-description">
                                 <span th:text="${lib.description()}"></span>
                             </td>
                         </tr>
                         </tbody>
                     </table>
-                </div> <!-- card-content -->
-            </div> <!-- card -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -95,7 +91,5 @@
         </p>
     </div>
 </footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" crossorigin="anonymous"></script>
 </body>
 </html>

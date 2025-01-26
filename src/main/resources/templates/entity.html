@@ -8,32 +8,17 @@
     <title>Qilletni Docs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Materialize CSS -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
 
-    <!-- Your SCSS compiled to style.css (matching the final "artist.html" style) -->
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<!-- Materialize Navbar -->
-<nav class="teal">
-    <div class="nav-wrapper">
-        <a href="#" class="brand-logo" style="margin-left: 1rem;">Qilletni Docs</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li class="active"><a href="#">Overview</a></li>
-            <li>
-                <a th:attr="href=${'/library/' + libraryName + '/index.html'}">Library</a>
-            </li>
-            <li><a href="#">Entity</a></li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="~{templates/fragments/nav_bar :: navBar(${libraryName}, true)}"></div>
 
 <!-- Main container -->
 <div class="container" style="margin-top: 2rem;">
@@ -124,7 +109,6 @@
 
                 <!-- Card body (inner doc, params, etc.) -->
                 <div class="card-content function-innerdoc">
-<!--                    <p class="code" constructor:signature="${documentedConstructor.itemBeingDocumented()}"></p>-->
                     <p formatteddoc:desc="${documentedConstructor.innerDoc().description()}"></p>
 
                     <!-- Params (if any) -->
@@ -174,13 +158,20 @@
             <div class="card function-doc hoverable"
                  th:each="documentedFunction : ${extensionFunctions}">
                 <div th:replace="~{templates/fragments/function_card :: functionCard(${documentedFunction})}"></div>
-            </div> <!-- end extension function card -->
+            </div>
         </div>
     </div>
-</div> <!-- end .container -->
+</div>
 
 <!-- Materialize JS (for any interactive components) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/flexsearch@0.7.31/dist/flexsearch.bundle.min.js"></script>
+<script src="/scripts/search.js"></script>
 
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeData(/*[[${searchIndexPath}]]*/ '');
+    });
+</script>
 </body>
 </html>

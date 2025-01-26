@@ -22,44 +22,18 @@
 </head>
 <body>
 
-<!-- Materialize Navbar -->
-<nav class="teal">
-    <div class="nav-wrapper">
-        <a href="#" class="brand-logo" style="margin-left: 1rem;">Qilletni Docs</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li>
-                <!-- Search form: style with Materialize or custom CSS -->
-                <form onsubmit="return false;" class="nav-search">
-                    <div class="input-field">
-                        <i class="material-icons prefix search-icon">search</i>
-                        <input id="search-input" type="text" placeholder="Search docs..." required>
-                    </div>
-                </form>
-            </li>
-            <li><a href="#">Overview</a></li>
-            <li><a href="/library/std/index.html">Library</a></li>
-            <li><a href="#">Entity</a></li>
-        </ul>
-    </div>
-</nav>
-
-<div id="search-popup" class="card" style="display: none;">
-    <ul id="search-results-list" class="collection" style="margin: 0;"></ul>
-</div>
+<div th:replace="~{templates/fragments/nav_bar :: navBar(${libraryName}, true)}"></div>
 
 <!-- Main container -->
 <div class="container" style="margin-top: 2rem;">
     <!-- Title & Intro -->
-    <div class="row">
+    <div class="row title-row">
         <div class="col s12">
-            <h2 class="library-title">Library [(<span th:text="${libraryName}"></span>)]</h2>
-            <span class="library-version">v0.0.1 &#x2022; Adam Yarris</span>
+            <h2 class="library-title">Library <span th:text="${libraryName}"></span></h2>
+            <span class="library-version"><span th:text="${'v' + library.version()}"></span> &#x2022; <span th:text="${library.author()}"></span></span>
 
             <div class="page-description">
-                <p>
-                    This is a simple library and service provider that allows you to manage
-                    your music collection through the Spotify API.
-                </p>
+                <p th:text="${library.description()}"></p>
             </div>
         </div>
     </div>
@@ -84,7 +58,7 @@
                                     </td>
                                     <td>
                                         This is a description for
-                                        "[(<span th:text="${documentedEntity.itemBeingDocumented().name()}"></span>)]".
+                                        "<span th:text="${documentedEntity.itemBeingDocumented().name()}"></span>".
                                     </td>
                                 </tr>
                                 </tbody>
@@ -149,10 +123,10 @@
                     </div>
                 </div>
 
-                <!-- On Extensions Section -->
+                <!-- Extension Functions Section -->
                 <div class="card l-box library-category">
                     <div class="card-content">
-                        <h3 class="content-subhead">On Extensions</h3>
+                        <h3 class="content-subhead">Extension Functions</h3>
                         <div class="category-list">
                             <table class="highlight responsive-table">
                                 <tbody>
@@ -195,7 +169,7 @@
 </footer>
 
 <!-- Materialize JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" crossorigin="anonymous"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" crossorigin="anonymous"></script>-->
 <script src="https://cdn.jsdelivr.net/npm/flexsearch@0.7.31/dist/flexsearch.bundle.min.js"></script>
 <script src="/scripts/search.js"></script>
 

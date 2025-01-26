@@ -18,6 +18,7 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.InnerDoc;
+import is.yarr.qilletni.docgen.cache.BasicQllData;
 import is.yarr.qilletni.docgen.cache.serializer.DocumentationSerializer.NilPlaceholder;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessageUnpacker;
@@ -43,6 +44,13 @@ public class DocumentationDeserializer implements AutoCloseable {
         unpackerHandler = new UnpackerHandler(unpacker);
     }
     
+    public SerializedLibrary deserializeLibrary() throws IOException {
+        var basicQllData = deserializeBasicQllData();
+        var documentedFiles = deserializeDocumentedFileList();
+        
+        return new SerializedLibrary(basicQllData, documentedFiles);
+    }
+
     public List<DocumentedFile> deserializeDocumentedFileList() throws IOException {
         var size = unpacker.unpackArrayHeader();
         
@@ -257,9 +265,21 @@ public class DocumentationDeserializer implements AutoCloseable {
 
         return false;
     }
+    
+    public BasicQllData deserializeBasicQllData() throws IOException {
+        var name = unpacker.unpackString();
+        var version = unpacker.unpackString();
+        var author = unpacker.unpackString();
+        var description = unpacker.unpackString();
+        
+        return new BasicQllData(name, version, author, description);
+    }
 
     @Override
     public void close() throws Exception {
         unpacker.close();
     }
+
+    public record SerializedLibrary(BasicQllData basicQllData, List<DocumentedFile> documentedFiles) {}
+
 }

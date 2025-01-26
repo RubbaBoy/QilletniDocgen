@@ -83,7 +83,7 @@ public class LinkFactory {
     }
 
     private static String generateQilletniTypeLink(String libraryName, String qilletniType) {
-        return "/library/%s/entity/%s.html".formatted(libraryName, qilletniType);
+        return "/library/%s/entity/%s".formatted(libraryName, qilletniType);
     }
 
     static {

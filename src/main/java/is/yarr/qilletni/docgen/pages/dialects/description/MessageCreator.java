@@ -28,7 +28,7 @@ public class MessageCreator {
     }
     
     public void processMessage() {
-        var stringMessage = convertDescriptionItemsToString(descriptionItems);
+        var stringMessage = convertDescriptionItemsToString(descriptionItems).trim();
         var renderedHtml = markdownParser.renderMarkdown(stringMessage);
         model.add(modelFactory.createText(renderedHtml));
     }
@@ -52,6 +52,6 @@ public class MessageCreator {
     }
 
     private static String removeSingleNewlines(String input) {
-        return input.replaceAll("(?<!\\n)\\n(?!\\n)", " ");
+        return input.replace("\r", "").replaceAll("(?<!\\n)\\n(?!\\n)", " ");
     }
 }

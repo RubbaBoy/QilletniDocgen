@@ -1,12 +1,13 @@
 package is.yarr.qilletni.docgen;
 
 import is.yarr.qilletni.api.lang.docs.structure.DocumentedFile;
+import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
+import is.yarr.qilletni.docgen.cache.BasicQllData;
 import is.yarr.qilletni.docgen.cache.CachedDocHandler;
 import is.yarr.qilletni.lang.docs.DefaultDocumentationParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -23,7 +24,7 @@ public class DocParserFactory {
         return cachedDocParserHandler.getCachedLibrayDocParser(libraryName);
     }
 
-    public static DocParser createDocParser(String libraryName, Path input, Path outputPath, Path cachePath) {
+    public static DocParser createDocParser(BasicQllData basicQllData, Path input, Path outputPath, Path cachePath) {
         try {
             if (Files.notExists(cachePath)) {
                 Files.createDirectories(cachePath);
@@ -44,7 +45,7 @@ public class DocParserFactory {
                 try {
                     LOGGER.debug("Parsing file: {}", file.getFileName());
 
-                    var parser = new DefaultDocumentationParser(libraryName);
+                    var parser = new DefaultDocumentationParser(basicQllData.name());
 
                     var documentedFile = parser.parseDocsFromPath(file, input.relativize(file).toString().replace("\\", "/"));
                     documentedFiles.add(documentedFile);
@@ -63,6 +64,6 @@ public class DocParserFactory {
             System.out.println(documentedFile + "\n");
         }
 
-        return DocParser.createInitializedParser(cachedDocParserHandler, libraryName, outputPath, documentedFiles);
+        return DocParser.createInitializedParser(cachedDocParserHandler, basicQllData, outputPath, documentedFiles);
     }
 }
