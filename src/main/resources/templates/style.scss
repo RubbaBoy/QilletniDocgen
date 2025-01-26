@@ -258,6 +258,11 @@ td.param-desc {
             display: flex;
             justify-content: space-between;
             
+            .result-title {
+                @extend .code;
+                //font-weight: 600;
+            }
+            
             .result-description {
                 text-overflow: ellipsis;
                 white-space: nowrap;

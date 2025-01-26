@@ -30,7 +30,7 @@ public class DocGenerator {
         LOGGER.info("Generating docs for library: {}", libraryName);
 
         processLibrary(libraryName, inputPath, outputPath, cachePath).stream()
-                .filter(docItem -> docItem instanceof DocumentedItem(DocumentedTypeFunction $, FunctionDoc $$))
+                .filter(docItem -> docItem instanceof DocumentedItem(DocumentedTypeFunction _, FunctionDoc _))
                 .collect(Collectors.groupingBy(TypeUtility::getOnStatus)).forEach((onStatusInfo, items) -> {
                     var cachedLibraryName = onStatusInfo.libraryName();
                     
@@ -64,6 +64,7 @@ public class DocGenerator {
         docParser.createIndexFile();
         docParser.createEntityFiles();
         docParser.writeToCache();
+        docParser.createSearchIndex();
 
         return docParser.getOnExtensionDocs();
     }

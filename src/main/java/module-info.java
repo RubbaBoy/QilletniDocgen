@@ -8,6 +8,7 @@ module QilletniDocgen.main {
     requires flexmark.util.data;
     requires flexmark;
     requires flexmark.util.ast;
+    requires com.google.gson;
 
     exports is.yarr.qilletni.docgen;
 }

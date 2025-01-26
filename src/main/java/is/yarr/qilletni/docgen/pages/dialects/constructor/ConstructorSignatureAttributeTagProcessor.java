@@ -43,11 +43,16 @@ public class ConstructorSignatureAttributeTagProcessor extends AbstractAttribute
             throw new RuntimeException("Expected a DocumentedTypeFunction, got " + executed.getClass().getCanonicalName());
         }
 
-        var body = "%s(%s)".formatted(
-                documentedEntityConstructor.name(),
-                String.join(", ", documentedEntityConstructor.params())
-        );
+        var body = getConstructorSignature(documentedEntityConstructor);
         
         structureHandler.setBody(HtmlEscape.escapeHtml5(body), false);
+    }
+    
+    // TODO: Move out?
+    public static String getConstructorSignature(DocumentedTypeEntityConstructor documentedTypeEntityConstructor) {
+        return "%s(%s)".formatted(
+                documentedTypeEntityConstructor.name(),
+                String.join(", ", documentedTypeEntityConstructor.params())
+        );
     }
 }

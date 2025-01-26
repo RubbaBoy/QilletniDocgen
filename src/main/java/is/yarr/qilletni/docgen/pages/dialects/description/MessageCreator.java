@@ -28,7 +28,7 @@ public class MessageCreator {
     }
     
     public void processMessage() {
-        var stringMessage = convertToString();
+        var stringMessage = convertDescriptionItemsToString(descriptionItems);
         var renderedHtml = markdownParser.renderMarkdown(stringMessage);
         model.add(modelFactory.createText(renderedHtml));
     }
@@ -38,7 +38,7 @@ public class MessageCreator {
      * 
      * @return The string message
      */
-    private String convertToString() {
+    public static String convertDescriptionItemsToString(List<DocDescription.DescriptionItem> descriptionItems) {
         return descriptionItems.stream().map(descriptionItem ->
                 switch (descriptionItem) {
                     case DocDescription.DocText docText -> removeSingleNewlines(docText.text());

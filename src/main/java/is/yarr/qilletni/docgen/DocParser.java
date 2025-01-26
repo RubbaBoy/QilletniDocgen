@@ -12,6 +12,7 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.EntityDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FieldDoc;
 import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import is.yarr.qilletni.docgen.cache.CachedDocHandler;
+import is.yarr.qilletni.docgen.index.SearchIndexGenerator;
 import is.yarr.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
 import is.yarr.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
 import is.yarr.qilletni.docgen.pages.dialects.entity.EntityDialect;
@@ -56,6 +57,8 @@ public class DocParser {
     private final Map<String, List<DocumentedItem>> entityConstructors;
     
     private final List<DocumentedItem> onExtensionDocs;
+    private final Path fullIndexPath;
+    private final String relativeIndexPath;
 
     public DocParser(CachedDocHandler cachedDocHandler, String libraryName, Path outputPath, List<DocumentedFile> documentedFiles) {
         this.cachedDocHandler = cachedDocHandler;
@@ -68,6 +71,9 @@ public class DocParser {
         this.fieldDocs = new ArrayList<>();
         this.entityConstructors = new HashMap<>();
         this.onExtensionDocs = new ArrayList<>();
+        
+        this.fullIndexPath = outputPath.resolve(getBasePath()).resolve("index.json");
+        this.relativeIndexPath = "/" + getBasePath().resolve("index.json").toString().replace("\\", "/");
     }
     
     public static DocParser createInitializedParser(CachedDocHandler cachedDocHandler, String libraryName, Path outputPath, List<DocumentedFile> documentedFiles) {
@@ -120,6 +126,7 @@ public class DocParser {
         context.setVariable("functionDocs", functionDocs);
         context.setVariable("fieldDocs", fieldDocs);
         context.setVariable("onExtensionDocs", onExtensionDocs);
+        context.setVariable("searchIndexPath", relativeIndexPath);
 
         var templateEngine = createTemplateEngine();
 
@@ -161,6 +168,8 @@ public class DocParser {
             context.setVariable("constructors", entityConstructors);
             
             context.setVariable("allFunctions", Stream.of(entityFunctions, entityExtensionFunctions).flatMap(List::stream).toList());
+
+            context.setVariable("searchIndexPath", relativeIndexPath);
 
             var templateEngine = createTemplateEngine();
 
@@ -214,9 +223,9 @@ public class DocParser {
                 .flatMap(documentedFile -> documentedFile.documentedItems().stream())
                 .forEach(documentedItem -> {
                     switch (documentedItem.innerDoc()) {
-                        case FieldDoc $ -> fieldDocs.add(documentedItem);
-                        case EntityDoc $ -> entityDocs.add(documentedItem);
-                        case FunctionDoc $ -> {
+                        case FieldDoc _ -> fieldDocs.add(documentedItem);
+                        case EntityDoc _ -> entityDocs.add(documentedItem);
+                        case FunctionDoc _ -> {
                             var documentedTypeFunction = (DocumentedTypeFunction) documentedItem.itemBeingDocumented();
                             if (documentedTypeFunction.onOptional().isPresent()) {
                                 onExtensionDocs.add(documentedItem);
@@ -224,7 +233,7 @@ public class DocParser {
                                 functionDocs.add(documentedItem);
                             }
                         }
-                        case ConstructorDoc $ -> { // Ignored, there will be none on a file-level (only entity level)
+                        case ConstructorDoc _ -> { // Ignored, there will be none on a file-level (only entity level)
 //                            System.out.println("got const doc " + documentedItem.itemBeingDocumented());
 //                            entityConstructors.merge(((DocumentedTypeEntity) documentedItem.itemBeingDocumented()).name(), List.of(documentedItem), (a, b) -> {
 //                                var newList = new ArrayList<>(a);
@@ -276,6 +285,15 @@ public class DocParser {
         });
 
         addExtendedFunctions(onExtensionDocs);
+    }
+    
+    public void createSearchIndex() {
+        try {
+            var indexGenerator = new SearchIndexGenerator(entityDocs, onExtensionDocs, functionDocs, libraryName);
+            indexGenerator.generateSearchIndex(outputPath.resolve(getBasePath()).resolve("index.json"));
+        } catch (IOException e) {
+            LOGGER.error("An error occurred while generating the search index.", e);
+        }
     }
 
     public void writeToCache() {

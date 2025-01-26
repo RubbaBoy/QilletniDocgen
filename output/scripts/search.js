@@ -6,19 +6,28 @@ const index = new FlexSearch.Document({
         // which fields to tokenize and search
         index: [
             "title",
-            "description"
-            // optionally "type" or "parent" if you want them searched
+            "description",
         ],
-        store: ['title', 'description', 'type', 'file', 'parent', 'library', 'url'] // specify which fields to store
+        store: ['title', 'description', 'type', 'file', 'parent', 'library', 'url'], // specify which fields to store
+    },
+    field: {
+        title: {
+            boost: 3 // weigh 'title' more than the default (1)
+        },
+        description: {
+            boost: 1 // or omit for default weighting
+        }
     },
     tokenize: "forward", // or "full", "strict", etc.
-    // Tweak other config like encode, stemmer, depth, etc., as needed
+    depth: 3,     // higher = deeper subscript matches 
+    threshold: 2, // fuzzy searching, higher = more lenient
+    bool: "and"
 });
 
 let docData = []; // Will store the JSON array
 
-function initializeData(libraryName) {
-    fetch(`/${libraryName}.json`)
+function initializeData(indexPath) {
+    fetch(indexPath)
         .then(response => response.json())
         .then(data => {
             docData = data;
@@ -30,27 +39,39 @@ function initializeData(libraryName) {
 
 const searchInput = document.getElementById('search-input');
 
+function flattenFlexsearchResults(rawResults) {
+    const flattenedHits = [];
+
+    // 1. Flatten in the order groups are listed
+    for (const group of rawResults) {
+        flattenedHits.push(...group.result);
+    }
+
+    // 2. Deduplicate by `id`, preserving first occurrence order
+    const seen = new Set();
+    const finalDocs = [];
+    for (const item of flattenedHits) {
+        if (!seen.has(item.id)) {
+            seen.add(item.id);
+            finalDocs.push(item.doc);
+        }
+    }
+
+    return finalDocs;
+}
+
 searchInput.addEventListener('input', async function() {
     const query = this.value.trim();
     if (!query) {
         hidePopup();
         return;
     }
-    const results = await index.search(query, { enrich: true });
+
+    const rawResults = await index.search(query, { limit: 10, enrich: true });
     
-    // Flatten or combine these results
-    const finalHits = [];
-    for (let r of results) {
-        finalHits.push(...r.result);
-    }
-
-    // Unique them by doc.id if needed:
-    const unique = {};
-    for (let hit of finalHits) {
-        unique[hit.doc.id] = hit.doc;
-    }
-
-    displaySearchResults(Object.values(unique));
+    let flattenedResults = flattenFlexsearchResults(rawResults);
+    
+    displaySearchResults(flattenedResults);
 });
 
 function displaySearchResults(docs) {
@@ -81,22 +102,25 @@ function displaySearchResults(docs) {
         // doc might have { id, title, description, type, etc. }
         const li = document.createElement('li');
         li.className = 'collection-item';
+        li.role = "button";
+        li.tabIndex = 0;
         
         let parentHtml = ''
-        if (doc.parent !== undefined) {
+        if (doc.parent !== undefined && doc.parent !== null) {
             parentHtml = `<span>${doc.parent}</span>`
         }
 
         // Example display with doc title, short description, etc.
         li.innerHTML = `
-      <div class="result-line"><span style="font-weight: 600;">${doc.title}</span>${parentHtml}</div>
+      <div class="result-line"><span class="result-title">${doc.title}</span>${parentHtml}</div>
       <div class="result-line"><small class="result-description">${doc.description || ''}</small><small class="result-file">${doc.file}</small></div>
     `;
 
         // Optionally link to the doc
         li.addEventListener('click', () => {
             // E.g. navigate to doc link
-            window.location.href = makeDocLink(doc);
+            console.log(doc.url);
+            window.location.href = doc.url;
         });
 
         list.appendChild(li);
@@ -109,18 +133,5 @@ function displaySearchResults(docs) {
 function hidePopup() {
     const popup = document.getElementById('search-popup');
     popup.style.display = 'none';
-}
-
-// Example link function
-function makeDocLink(doc) {
-    if (doc.type === 'entity') {
-        // e.g. /library/Artist.html
-        return `/library/${doc.url}`;
-    } else if (doc.type === 'method') {
-        // e.g. /library/Artist.html#method-getName
-        return `/library/${doc.url}#${doc.id}`;
-    } else {
-        return '#';
-    }
 }
 

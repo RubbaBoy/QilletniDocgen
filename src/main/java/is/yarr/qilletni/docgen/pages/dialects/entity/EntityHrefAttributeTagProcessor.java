@@ -46,8 +46,16 @@ public class EntityHrefAttributeTagProcessor extends AbstractAttributeTagProcess
             throw new RuntimeException("Expected a DocumentedTypeEntity, got " + executed.getClass().getCanonicalName());
         }
         
-        var linkText = "/library/%s/entity/%s.html".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()), URLEncoder.encode(documentedEntity.name(), Charset.defaultCharset()));
+        var linkText = getEntityUrl(attributeValue, documentedEntity.name());
         
         structureHandler.setAttribute("href", linkText);
+    }
+    
+    public static String getLibraryUrl(String libraryName) {
+        return "/library/%s/".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()));
+    }
+    
+    public static String getEntityUrl(String libraryName, String entityName) {
+        return "/library/%s/entity/%s.html".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()), URLEncoder.encode(entityName, Charset.defaultCharset()));
     }
 }
