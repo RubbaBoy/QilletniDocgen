@@ -101,28 +101,29 @@ function displaySearchResults(docs) {
     docs.forEach(doc => {
         // doc might have { id, title, description, type, etc. }
         const li = document.createElement('li');
-        li.className = 'collection-item';
-        li.role = "button";
-        li.tabIndex = 0;
-        
-        let parentHtml = ''
+        // li.className = 'collection-item';
+
+        // Create the <a> element
+        const a = document.createElement('a');
+        a.href = doc.url;
+        a.className = 'result-link';
+        a.tabIndex = 0;
+
+        // Optionally add aria roles or labels if needed
+        a.setAttribute('aria-label', `View details about ${doc.title}`);
+
+        let parentHtml = '';
         if (doc.parent !== undefined && doc.parent !== null) {
-            parentHtml = `<span>${doc.parent}</span>`
+            parentHtml = `<span>${doc.parent}</span>`;
         }
 
-        // Example display with doc title, short description, etc.
-        li.innerHTML = `
-      <div class="result-line"><span class="result-title">${doc.title}</span>${parentHtml}</div>
-      <div class="result-line"><small class="result-description">${doc.description || ''}</small><small class="result-file">${doc.file}</small></div>
-    `;
+        // Add the HTML content to the <a>
+        a.innerHTML = `
+          <div class="result-line"><span class="result-title">${doc.title}</span>${parentHtml}</div>
+          <div class="result-line"><small class="result-description">${doc.description || ''}</small><small class="result-file">${doc.file}</small></div>
+        `;
 
-        // Optionally link to the doc
-        li.addEventListener('click', () => {
-            // E.g. navigate to doc link
-            console.log(doc.url);
-            window.location.href = doc.url;
-        });
-
+        li.appendChild(a);
         list.appendChild(li);
     });
 

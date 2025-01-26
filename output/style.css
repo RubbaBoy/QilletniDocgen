@@ -16,7 +16,7 @@ body {
   font-family: var(--sans-font-family), sans-serif;
 }
 
-.code, #search-results-list .collection-item .result-line .result-title {
+.code, #search-results-list li .result-link .result-line .result-title {
   font-family: var(--mono-font-family), monospace;
   color: #37474f; /* subtle dark color for code text */
 }
@@ -206,22 +206,31 @@ td.param-desc {
 #search-results-list {
   margin: 0;
 }
-#search-results-list .collection-item {
-  cursor: pointer;
+#search-results-list li {
+  padding: 0;
 }
-#search-results-list .collection-item:hover {
+#search-results-list li .result-link {
+  display: block;
+  background-color: #fff;
+  line-height: 1.5rem;
+  padding: 10px 20px;
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
+  color: inherit;
+}
+#search-results-list li .result-link:hover {
   background-color: #f0f0f0;
 }
-#search-results-list .collection-item .result-line {
+#search-results-list li .result-link .result-line {
   display: flex;
   justify-content: space-between;
 }
-#search-results-list .collection-item .result-line .result-description {
+#search-results-list li .result-link .result-line .result-description {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
-#search-results-list .collection-item .result-line .result-file {
+#search-results-list li .result-link .result-line .result-file {
   margin-left: 0.25em;
 }
 

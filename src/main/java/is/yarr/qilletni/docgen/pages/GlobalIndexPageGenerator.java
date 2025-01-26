@@ -30,7 +30,6 @@ public class GlobalIndexPageGenerator {
 
     public void generateIndex() throws IOException {
         var cachedLibraries = new ArrayList<>(fetchCachedLibraries());
-        cachedLibraries.addAll(cachedLibraries);
 
         var context = new Context();
         context.setVariable("libraries", cachedLibraries);

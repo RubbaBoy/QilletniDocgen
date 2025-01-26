@@ -174,7 +174,7 @@ public class SearchIndexGenerator {
         }
         
         return switch (documentedType) {
-            case DocumentedTypeEntity documentedTypeEntity -> baseUrl;
+            case DocumentedTypeEntity documentedTypeEntity -> "%sentity/%s".formatted(baseUrl, documentedTypeEntity.name());
             case DocumentedTypeEntityConstructor documentedTypeEntityConstructor -> "%s#%s".formatted(baseUrl, AnchorFactory.createAnchorForConstructor(documentedTypeEntityConstructor));
             case DocumentedTypeField documentedTypeField -> baseUrl; // Not fully supported yet
             case DocumentedTypeFunction documentedTypeFunction -> "%s#%s".formatted(baseUrl, AnchorFactory.createAnchorForFunction(documentedTypeFunction));
