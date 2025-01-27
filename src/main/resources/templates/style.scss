@@ -70,6 +70,7 @@ body {
 
     .card-content {
         position: relative; // so we can position the anchor link more easily if desired
+        padding-bottom: 14px;
 
         .card-title {
             margin-bottom: 0.25em;
@@ -113,6 +114,12 @@ body {
     ul.browser-default {
         list-style-type: disc;
         margin-left: 1.5em;
+    }
+    
+    .bottom-ribbon {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
     }
 }
 

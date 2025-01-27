@@ -61,6 +61,7 @@ body {
 }
 .function-doc .card-content {
   position: relative;
+  padding-bottom: 14px;
 }
 .function-doc .card-content .card-title {
   margin-bottom: 0.25em;
@@ -97,6 +98,11 @@ body {
 .function-doc ul.browser-default {
   list-style-type: disc;
   margin-left: 1.5em;
+}
+.function-doc .bottom-ribbon {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
 .page-footer .container p {

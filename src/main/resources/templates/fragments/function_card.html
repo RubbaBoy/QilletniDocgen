@@ -63,6 +63,10 @@
             <span class="function-params">On</span>
             <p formatteddoc:desc="${documentedFunction.innerDoc().docOnLine().description()}"></p>
         </div>
+        
+        <div class="bottom-ribbon">
+            <small th:if="${documentedFunction.itemBeingDocumented().importPath() != null}" th:text="${documentedFunction.itemBeingDocumented().importPath()}" class="code file-ribbon"></small>
+        </div>
     </div>
 </div>
 </html>
