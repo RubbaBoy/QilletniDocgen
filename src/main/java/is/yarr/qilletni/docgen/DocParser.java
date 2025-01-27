@@ -14,6 +14,7 @@ import is.yarr.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import is.yarr.qilletni.api.lib.qll.QilletniInfoData;
 import is.yarr.qilletni.docgen.cache.BasicQllData;
 import is.yarr.qilletni.docgen.cache.CachedDocHandler;
+import is.yarr.qilletni.docgen.index.DescriptionFormatter;
 import is.yarr.qilletni.docgen.index.SearchIndexGenerator;
 import is.yarr.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
 import is.yarr.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
@@ -58,6 +59,7 @@ public class DocParser {
     private final List<DocumentedItem> functionDocs;
     private final List<DocumentedItem> fieldDocs;
     private final Map<String, List<DocumentedItem>> entityConstructors;
+    private final DescriptionFormatter descriptionFormatter;
     
     private final List<DocumentedItem> onExtensionDocs;
     private final Path fullIndexPath;
@@ -75,6 +77,7 @@ public class DocParser {
         this.fieldDocs = new ArrayList<>();
         this.entityConstructors = new HashMap<>();
         this.onExtensionDocs = new ArrayList<>();
+        this.descriptionFormatter = new DescriptionFormatter();
         
         this.fullIndexPath = outputPath.resolve(getBasePath()).resolve("index.json");
         this.relativeIndexPath = "/" + getBasePath().resolve("index.json").toString().replace("\\", "/");
@@ -132,6 +135,7 @@ public class DocParser {
         context.setVariable("fieldDocs", fieldDocs);
         context.setVariable("onExtensionDocs", onExtensionDocs);
         context.setVariable("searchIndexPath", relativeIndexPath);
+        context.setVariable("descriptionFormatter", descriptionFormatter);
 
         var templateEngine = createTemplateEngine();
 
@@ -176,6 +180,7 @@ public class DocParser {
             context.setVariable("allFunctions", Stream.of(entityFunctions, entityExtensionFunctions).flatMap(List::stream).toList());
 
             context.setVariable("searchIndexPath", relativeIndexPath);
+            context.setVariable("descriptionFormatter", descriptionFormatter);
 
             var templateEngine = createTemplateEngine();
 

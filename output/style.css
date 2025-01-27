@@ -118,6 +118,9 @@ a {
 a:hover {
   color: #bb7a2a;
 }
+a.monospace {
+  font-family: var(--mono-font-family), monospace;
+}
 
 .function-anchor {
   margin-right: 0.5rem;

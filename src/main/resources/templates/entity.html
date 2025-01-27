@@ -81,7 +81,7 @@
                             <!-- Extension info placeholder, if any -->
                             <a function:fromExtension="${documentedFunction}" class="from-extension"></a>
                         </td>
-                        <td formatteddoc:desc="${documentedFunction.innerDoc().description()}"></td>
+                        <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
                     </tr>
                     </tbody>
                 </table>

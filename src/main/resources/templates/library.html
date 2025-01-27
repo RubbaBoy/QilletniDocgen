@@ -40,9 +40,9 @@
 
     <!-- Library Sections Row -->
     <div class="row library-sections">
-        <!-- Left column -->
-        <div class="col s12 m6">
-            <div class="category-column">
+        <!-- Left column  was m6 -->
+<!--        <div class="col s12">-->
+<!--            <div class="category-column">-->
 
                 <!-- Entities Section -->
                 <div class="card l-box library-category">
@@ -54,12 +54,9 @@
                                 <tr th:each="documentedEntity : ${entityDocs}">
                                     <td>
                                         <a entity:link="${documentedEntity.itemBeingDocumented()}"
-                                           th:text="${documentedEntity.itemBeingDocumented().name()}">-</a>
+                                           th:text="${documentedEntity.itemBeingDocumented().name()}" class="monospace">-</a>
                                     </td>
-                                    <td>
-                                        This is a description for
-                                        "<span th:text="${documentedEntity.itemBeingDocumented().name()}"></span>".
-                                    </td>
+                                    <td th:text="${descriptionFormatter.getShortPlainDescription(documentedEntity.innerDoc(), 300)}"></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -77,9 +74,9 @@
                                 <tr th:each="documentedFunction : ${functionDocs}">
                                     <td>
                                         <a function:link="${documentedFunction.itemBeingDocumented()}"
-                                           function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
+                                           function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
                                     </td>
-                                    <td>This is a description for redirectToList.</td>
+                                    <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -87,12 +84,12 @@
                     </div>
                 </div>
 
-            </div>
-        </div>
+<!--            </div>-->
+<!--        </div>-->
 
-        <!-- Right column -->
-        <div class="col s12 m6">
-            <div class="category-column">
+        <!-- Right column  was m6 -->
+<!--        <div class="col s12">-->
+<!--            <div class="category-column">-->
 
                 <!-- Import Aliases Section -->
                 <div class="card l-box library-category">
@@ -143,8 +140,8 @@
                     </div>
                 </div>
 
-            </div>
-        </div>
+<!--            </div>-->
+<!--        </div>-->
     </div>
 
     <!-- Function Definitions -->

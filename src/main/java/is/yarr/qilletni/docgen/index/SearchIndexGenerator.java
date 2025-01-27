@@ -39,15 +39,14 @@ public class SearchIndexGenerator {
     private final List<DocumentedItem> onExtensionDocs;
     private final List<DocumentedItem> globalFunctionDocs;
     private final String libraryName;
-    private final Parser parser;
+    private final DescriptionFormatter descriptionFormatter;
 
     public SearchIndexGenerator(List<DocumentedItem> entityDocs, List<DocumentedItem> onExtensionDocs, List<DocumentedItem> globalFunctionDocs, String libraryName) {
         this.entityDocs = entityDocs;
         this.onExtensionDocs = onExtensionDocs;
         this.globalFunctionDocs = globalFunctionDocs;
         this.libraryName = libraryName;
-
-        this.parser = Parser.builder().build();
+        this.descriptionFormatter = new DescriptionFormatter();
     }
 
     public void generateSearchIndex(Path outputFile) throws IOException {
@@ -99,7 +98,7 @@ public class SearchIndexGenerator {
         
         var title = createTitle(documentedType);
         var url = createUrl(documentedType, parentOverride);
-        var description = getPlainDescription(documentedItem.innerDoc());
+        var description = descriptionFormatter.getPlainDescription(documentedItem.innerDoc());
         return new IndexEntry(id, indexType, parent, title, documentedType.importPath(), url, documentedType.libraryName(), description);
     }
     
@@ -118,32 +117,6 @@ public class SearchIndexGenerator {
             case DocumentedTypeField _ -> "field";
             case DocumentedTypeFunction _ -> "function";
         };
-    }
-
-    /**
-     * Gets a string description of the given {@link InnerDoc}, without any markdown formatting. If no doc is found,
-     * return an empty string.
-     * 
-     * @param innerDoc The documentation to strip markdown from
-     * @return The string doc
-     */
-    private String getPlainDescription(InnerDoc innerDoc) {
-        var docDescription = switch (innerDoc) {
-            case ConstructorDoc constructorDoc -> constructorDoc.description();
-            case EntityDoc entityDoc -> entityDoc.description();
-            case FieldDoc fieldDoc -> fieldDoc.description();
-            case FunctionDoc functionDoc -> functionDoc.description();
-        };
-        
-        if (docDescription == null) {
-            return "";
-        }
-        
-        var markdownString = MessageCreator.convertDescriptionItemsToString(docDescription.descriptionItems());
-
-        var node = parser.parse(markdownString);
-        var textVisitor = new TextCollectingVisitor();
-        return textVisitor.collectAndGetText(node);
     }
 
     private String generateId(DocumentedType documentedType) {
