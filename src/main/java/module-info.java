@@ -1,7 +1,8 @@
-module QilletniDocgen.main {
+module qilletni.docgen {
+    requires qilletni.impl;
+    requires qilletni.api;
+    
     requires thymeleaf;
-    requires Qilletni.qilletni.api.main;
-    requires is.yarr.qilletni.Qilletni.main;
     requires org.slf4j;
     requires unbescape;
     requires msgpack.core;

@@ -1,19 +1,21 @@
 plugins {
     id 'java'
-    id 'application'
     id 'maven-publish'
 }
 
 group = 'is.yarr.qilletni.docgen'
 version = '1.0.0-SNAPSHOT'
 
-application {
-    mainClass = 'is.yarr.qilletni.docgen.Main'
-}
-
 repositories {
     mavenCentral()
-    mavenLocal()
+
+    maven {
+        url = "https://maven.pkg.github.com/rubbaboy/Qilletni"
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 java {
@@ -30,8 +32,8 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
 
-    compileOnly 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT'
-    compileOnly 'is.yarr.qilletni:Qilletni:1.0.0-SNAPSHOT:sources'
+    compileOnly 'is.yarr.qilletni:qilletni:1.0.0-SNAPSHOT'
+    compileOnly 'is.yarr.qilletni:qilletni:1.0.0-SNAPSHOT:sources'
 
     compileOnly 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
 
@@ -56,29 +58,31 @@ publishing {
             from components.java
         }
     }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/rubbaboy/QilletniDocgen"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 test {
     useJUnitPlatform()
 }
-//    doFirst {
-//        classpath = files()
-//        jvmArgs = [
-//                '--module-path', sourceSets.test.runtimeClasspath.asPath,
-//                '--add-modules', 'ALL-MODULE-PATH',
-//                '--add-reads', 'test=ALL-UNNAMED'
-//        ]
-//    }
-//}
 
 tasks.compileJava {
     doFirst {
-        options.compilerArgs = [
-                '--module-path', classpath.asPath
-        ]
+        def fullClasspath = sourceSets.main.compileClasspath.asPath
+        options.compilerArgs = ['--module-path', fullClasspath, ]
         classpath = files()
     }
 }
+
 
 tasks.register('generateHtml', JavaExec) {
     mainClass = 'is.yarr.qilletni.docgen.Main'
