@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'is.yarr.qilletni.docgen'
+group = 'dev.qilletni.docgen'
 version = '1.0.0-SNAPSHOT'
 
 repositories {
@@ -32,10 +32,10 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
 
-    compileOnly 'is.yarr.qilletni:qilletni:1.0.0-SNAPSHOT'
-    compileOnly 'is.yarr.qilletni:qilletni:1.0.0-SNAPSHOT:sources'
+    compileOnly 'dev.qilletni.impl:qilletni:1.0.0-SNAPSHOT'
+    compileOnly 'dev.qilletni.impl:qilletni:1.0.0-SNAPSHOT:sources'
 
-    compileOnly 'is.yarr.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
+    compileOnly 'dev.qilletni.api:qilletni-api:1.0.0-SNAPSHOT'
 
     // For markdown parsing
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
@@ -85,6 +85,6 @@ tasks.compileJava {
 
 
 tasks.register('generateHtml', JavaExec) {
-    mainClass = 'is.yarr.qilletni.docgen.Main'
+    mainClass = 'dev.qilletni.docgen.Main'
     classpath = sourceSets.main.runtimeClasspath
 }

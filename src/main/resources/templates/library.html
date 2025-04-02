@@ -132,7 +132,7 @@
                                         <a function:onlink="${documentedFunction}"
                                            function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
                                     </td>
-                                    <td>This is a description for redirectToList.</td>
+                                    <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
                                 </tr>
                                 </tbody>
                             </table>

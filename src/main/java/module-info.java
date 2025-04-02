@@ -11,5 +11,5 @@ module qilletni.docgen {
     requires flexmark.util.ast;
     requires com.google.gson;
 
-    exports is.yarr.qilletni.docgen;
+    exports dev.qilletni.docgen;
 }
