@@ -1,6 +1,7 @@
 package dev.qilletni.docgen.pages.dialects.utility;
 
 import dev.qilletni.api.lang.docs.structure.item.DocumentedTypeEntityConstructor;
+import dev.qilletni.api.lang.docs.structure.item.DocumentedTypeField;
 import dev.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
 
 import java.net.URLEncoder;
@@ -24,6 +25,15 @@ public class AnchorFactory {
         var body = "%s(%s)".formatted(
                 documentedEntityConstructor.name(),
                 String.join(", ", documentedEntityConstructor.params())
+        );
+
+        return URLEncoder.encode(body, Charset.defaultCharset());
+    }
+
+    public static String createAnchorForField(DocumentedTypeField documentedField) {
+        var body = "%s %s".formatted(
+                documentedField.type(),
+                documentedField.name()
         );
 
         return URLEncoder.encode(body, Charset.defaultCharset());

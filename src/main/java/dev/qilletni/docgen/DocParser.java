@@ -18,6 +18,7 @@ import dev.qilletni.docgen.index.SearchIndexGenerator;
 import dev.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
 import dev.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
 import dev.qilletni.docgen.pages.dialects.entity.EntityDialect;
+import dev.qilletni.docgen.pages.dialects.field.FieldDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
 import dev.qilletni.docgen.pages.dialects.utility.TypeUtility;
@@ -108,6 +109,7 @@ public class DocParser {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         templateEngine.addDialect(new FunctionDialect());
+        templateEngine.addDialect(new FieldDialect());
         templateEngine.addDialect(new EntityDialect(libraryName));
         templateEngine.addDialect(new FormattedDocDialect());
         templateEngine.addDialect(new ConstructorDialect());

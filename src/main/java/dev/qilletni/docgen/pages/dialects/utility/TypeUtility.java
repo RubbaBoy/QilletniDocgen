@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class TypeUtility {
 
-    public static final List<String> NATIVE_QILLETNI_TYPES = List.of("int", "double", "string", "boolean", "collection", "song", "album", "list", "java");
+    public static final List<String> NATIVE_QILLETNI_TYPES = List.of("int", "double", "string", "boolean", "collection", "song", "album", "list", "java", "function");
 
     public static boolean isNativeType(String qilletniType) {
         return NATIVE_QILLETNI_TYPES.contains(qilletniType);
