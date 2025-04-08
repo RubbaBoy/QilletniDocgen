@@ -12,8 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,8 @@ public class DocGenerator {
      * @param libraryQll  The library to generate documentation for
      */
     public void generateDocs(Path inputPath, QilletniInfoData libraryQll) throws IOException {
+        initializeDirectory();
+        
         LOGGER.info("Generating docs for library: {}", libraryQll.name());
         
         var basicQllData = new BasicQllData(libraryQll);
@@ -73,6 +78,30 @@ public class DocGenerator {
                         LOGGER.error("Failed to process cached library: {}", cachedLibraryName, e);
                     }
                 });
+    }
+
+    /**
+     * Ensure directory is initialized and exists. This copies static global files to ensure it up to date.
+     */
+    private void initializeDirectory() throws IOException {
+        var scriptsPath = outputPath.resolve("scripts");
+        Files.createDirectories(scriptsPath);
+        
+        copyResourceToDisk("/static/style.css", outputPath.resolve("style.css"));
+        copyResourceToDisk("/static/scripts/search.js", scriptsPath.resolve("scripts.css"));
+    }
+
+    public static void copyResourceToDisk(String resourcePath, Path targetPath) throws IOException {
+        // Open the resource as a stream
+        try (InputStream in = DocGenerator.class.getResourceAsStream(resourcePath)) {
+            if (in == null) {
+                throw new IOException("Resource not found: " + resourcePath);
+            }
+            // Ensure the target directory exists
+            Files.createDirectories(targetPath.getParent());
+            // Copy the data to the target path, replacing it if it exists
+            Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
     
     public void regenerateGlobalIndex() throws IOException {

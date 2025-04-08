@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'io.bit3:jsass:5.10.4'  // Use the latest version available
+    }
+}
+
 plugins {
     id 'java'
     id 'maven-publish'
@@ -88,4 +97,23 @@ tasks.compileJava {
 tasks.register('generateHtml', JavaExec) {
     mainClass = 'dev.qilletni.docgen.Main'
     classpath = sourceSets.main.runtimeClasspath
+}
+
+import io.bit3.jsass.Compiler
+import io.bit3.jsass.Options
+
+task compileScss {
+    jar.dependsOn compileScss
+
+    doLast {
+        File inputFile = file('src/main/resources/static/style.scss')
+        File outputFile = file('build/resources/main/static/style.css')
+        outputFile.parentFile.mkdirs()
+
+        Compiler compiler = new Compiler()
+        Options options = new Options()
+
+        def result = compiler.compileString(inputFile.text, options)
+        outputFile.text = result.getCss()
+    }
 }
