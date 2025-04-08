@@ -48,6 +48,7 @@ public class DocumentationSerializer implements AutoCloseable {
 
     public void serializeDocumentedFile(DocumentedFile documentedFile) throws IOException {
         packer.packString(documentedFile.fileName());
+        packer.packString(documentedFile.importPath().toString());
         packer.packArrayHeader(documentedFile.documentedItems().size());
         for (var documentedItem : documentedFile.documentedItems()) {
             serializeDocumentedItem(documentedItem);

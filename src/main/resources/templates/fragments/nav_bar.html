@@ -21,6 +21,9 @@
 
                 <li><a href="/">All Libraries</a></li>
                 <li th:if="${libraryName != null}">
+                    <a th:href="${'/library/' + libraryName + '/files'}">Library Files</a>
+                </li>
+                <li th:if="${libraryName != null}">
                     <a th:href="${'/library/' + libraryName + '/'}" th:text="${libraryName}">
                     </a>
                 </li>

@@ -22,6 +22,7 @@ import dev.qilletni.docgen.pages.dialects.field.FieldDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
 import dev.qilletni.docgen.pages.dialects.utility.TypeUtility;
+import dev.qilletni.docgen.pages.filetree.FileNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
@@ -125,7 +126,61 @@ public class DocParser {
         }
     }
     
-    public void createLibraryIndesPage() throws IOException {
+    public void createLibraryFilesPage() throws IOException {
+        var context = new Context();
+        context.setVariable("libraryName", libraryName);
+        context.setVariable("library", basicQllData);
+
+        var fileList = documentedFiles.stream().map(DocumentedFile::importPath).toList();
+
+        List<FileNode> fileTree = buildFileTree(fileList);
+        context.setVariable("fileTree", fileTree);
+
+        var templateEngine = createTemplateEngine();
+
+        var outputDir = Files.createDirectories(outputPath.resolve(getBasePath()));
+
+        processAndWrite("templates/files.html", outputDir.resolve("files.html"), templateEngine, context);
+    }
+
+    private List<FileNode> buildFileTree(List<Path> filePaths) {
+        // Create a map to hold folder nodes by their path string.
+        var roots = new ArrayList<FileNode>();
+
+        for (Path path : filePaths) {
+            var parts = path.toString().replace("\\", "/").split("/");
+
+            List<FileNode> currentLevel = roots;
+            var currentPath = "";
+            for (int i = 0; i < parts.length; i++) {
+                var part = parts[i];
+                var isLast = (i == parts.length - 1);
+                currentPath = currentPath.isEmpty() ? part : currentPath + "/" + part;
+                
+                // Check if a node for this folder/file already exists at currentLevel
+                var node = currentLevel.stream()
+                        .filter(n -> n.name().equals(part))
+                        .findFirst()
+                        .orElse(null);
+                
+                if (node == null) {
+                    // Determine if this part is a directory (if it is not the last part, or if the file system tells you so)
+                    boolean isDirectory = !isLast;
+                    node = new FileNode(part, isDirectory);
+                    currentLevel.add(node);
+                }
+                
+                // For a directory, set the current level to its children.
+                if (!isLast) {
+                    currentLevel = node.children();
+                }
+            }
+        }
+        
+        return roots;
+    }
+    
+    public void createLibraryIndexPage() throws IOException {
 //        initDocumentedItems();
         
         var context = new Context();

@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +64,7 @@ public class DocumentationDeserializer implements AutoCloseable {
     
     public DocumentedFile deserializeDocumentedFile() throws IOException {
         var fileName = unpacker.unpackString();
+        var importPath = Paths.get(unpacker.unpackString());
         var documentedItemsSize = unpacker.unpackArrayHeader();
 
         LOGGER.debug("Deserializing file: {} with {} items", fileName, documentedItemsSize);
@@ -73,7 +75,7 @@ public class DocumentationDeserializer implements AutoCloseable {
             documentedItems.add(documentedItem);
         }
         
-        return new DocumentedFile(fileName, documentedItems);
+        return new DocumentedFile(fileName, importPath, documentedItems);
     }
     
     public DocumentedItem deserializeDocumentedItem() throws IOException {

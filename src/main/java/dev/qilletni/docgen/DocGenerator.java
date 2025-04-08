@@ -83,7 +83,8 @@ public class DocGenerator {
     private static List<DocumentedItem> processLibrary(BasicQllData basicQllData, Path libraryPath, Path outputPath, Path cachePath) throws IOException {
         var docParser = DocParserFactory.createDocParser(basicQllData, libraryPath, outputPath, cachePath);
 
-        docParser.createLibraryIndesPage();
+        docParser.createLibraryIndexPage();
+        docParser.createLibraryFilesPage();
         docParser.createEntityPages();
         docParser.writeToCache();
         docParser.createSearchIndex();
@@ -100,7 +101,8 @@ public class DocGenerator {
         
         var docParser = docParserOptional.get();
 
-        docParser.createLibraryIndesPage();
+        docParser.createLibraryIndexPage();
+        docParser.createLibraryFilesPage();
         docParser.addExtendedFunctions(onExtensionsDocs);
         docParser.createEntityPages();
         docParser.writeToCache();

@@ -8,6 +8,7 @@ version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 
     maven {
         url = "https://maven.pkg.github.com/rubbaboy/Qilletni"
