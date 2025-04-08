@@ -143,7 +143,9 @@ a {
     &:hover {
         color: #bb7a2a;
     }
-    
+}
+
+a, span {
     &.monospace {
         font-family: var(--mono-font-family), monospace;
     }

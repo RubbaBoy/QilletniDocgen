@@ -51,7 +51,7 @@
                         <td class="left-column">
                             <!-- Link placeholder for the constructor -->
                             <a constructor:link="${documentedConstructor.itemBeingDocumented()}"
-                               constructor:signature="${documentedConstructor.itemBeingDocumented()}">-</a>
+                               constructor:signature="${documentedConstructor.itemBeingDocumented()}" class="monospace">-</a>
                         </td>
                         <td formatteddoc:desc="${documentedConstructor.innerDoc().description()}"></td>
                     </tr>
@@ -77,9 +77,9 @@
                     <tr th:each="documentedFunction : ${allFunctions}">
                         <td class="left-column">
                             <a function:link="${documentedFunction.itemBeingDocumented()}"
-                               function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
+                               function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
                             <!-- Extension info placeholder, if any -->
-                            <a function:fromExtension="${documentedFunction}" class="from-extension"></a>
+                            <a function:fromExtension="${documentedFunction}" class="from-extension monospace"></a>
                         </td>
                         <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
                     </tr>

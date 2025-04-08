@@ -6,9 +6,9 @@
                th:text="${node.directory} ? 'folder' : 'insert_drive_file'">
             </i>
             
-            <span th:if="${node.directory}" th:text="${node.name}"></span>
+            <span th:if="${node.directory}" th:text="${node.name + '/'}" class="monospace"></span>
             
-            <a th:if="${!node.directory}" th:text="${node.name}" file:link="${node}"></a>
+            <a th:if="${!node.directory}" th:text="${node.name}" file:link="${node}" class="monospace"></a>
             
             <!-- If this node is a directory and has children, render them recursively -->
             <div th:if="${node.directory and #lists.isNotEmpty(node.children)}"

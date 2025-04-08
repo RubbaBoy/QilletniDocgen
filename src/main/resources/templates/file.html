@@ -69,7 +69,7 @@
                     <tr th:each="documentedFunction : ${functions}">
                         <td class="left-column">
                             <a function:link="${documentedFunction.itemBeingDocumented()}"
-                               function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
+                               function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
                             <!-- Extension info placeholder, if any -->
                             <a function:fromExtension="${documentedFunction}" class="from-extension"></a>
                         </td>
@@ -98,7 +98,7 @@
                         <td class="left-column">
                             <a field:link="${documentedField.itemBeingDocumented()}"
                                field:signature="${documentedField.itemBeingDocumented()}"
-                               field:anchor="${documentedField.itemBeingDocumented()}">-</a>
+                               field:anchor="${documentedField.itemBeingDocumented()}" class="monospace">-</a>
                         </td>
                         <td formatteddoc:desc="${documentedField.innerDoc().description()}"></td>
                     </tr>

@@ -130,7 +130,7 @@
                                 <tr th:each="documentedFunction : ${onExtensionDocs}">
                                     <td>
                                         <a function:onlink="${documentedFunction}"
-                                           function:signature="${documentedFunction.itemBeingDocumented()}">-</a>
+                                           function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
                                     </td>
                                     <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
                                 </tr>
