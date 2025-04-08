@@ -12,7 +12,7 @@
             
             <!-- If this node is a directory and has children, render them recursively -->
             <div th:if="${node.directory and #lists.isNotEmpty(node.children)}"
-                 th:replace="this ::treeFragment(${node.children})">
+                 th:replace="~{this :: treeFragment(${node.children})}">
             </div>
         </li>
     </ul>

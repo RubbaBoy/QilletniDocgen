@@ -83,13 +83,6 @@
 </div>
 
 <!-- Footer -->
-<footer class="page-footer teal lighten-2" style="margin-top:2rem;">
-    <div class="container center-align">
-        <p>
-            Generated on:
-            <span th:text="${#dates.format(new java.util.Date(), 'yyyy-MM-dd HH:mm:ss')}"></span>
-        </p>
-    </div>
-</footer>
+<div th:replace="~{templates/fragments/footer :: footer}"></div>
 </body>
 </html>

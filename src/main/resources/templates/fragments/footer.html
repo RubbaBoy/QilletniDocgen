@@ -1,0 +1,18 @@
+<footer th:fragment="footer" class="page-footer teal lighten-2">
+    <div class="container">
+        <div class="row valign-wrapper" style="margin-bottom: 0;">
+            <div class="col s12 m6 left-align">
+                <p style="margin:0;">
+                    Generated on:
+                    <span th:text="${#dates.format(new java.util.Date(), 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    with <a href="https://github.com/RubbaBoy/QilletniDocgen" target="_blank" rel="noopener noreferrer">QilletniDocgen</a>
+                </p>
+            </div>
+            <div class="col s12 m6 right-align">
+                <p style="margin:0;">
+                    &copy; <span th:text="${#dates.format(new java.util.Date(), 'yyyy')}"></span> Adam Yarris. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
