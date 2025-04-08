@@ -89,6 +89,16 @@
         </div>
     </div>
 
+    <!-- Fields section (simple list) -->
+    <div th:if="${!fields.isEmpty()}" class="row doc-overview">
+        <div class="col s12">
+            <h4>Field Overview</h4>
+            <div class="doc-overview-container">
+                <div th:replace="~{templates/fragments/field_overview :: fieldOverview(${fields})}"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Constructors Section (cards) -->
     <div th:if="${!constructors.isEmpty()}" class="row constructor-definitions">
         <div class="col s12">
@@ -138,33 +148,6 @@
         </div>
     </div>
 
-    <!-- Fields section (simple list) -->
-    <div th:if="${!functions.isEmpty()}" class="row doc-overview">
-        <div class="col s12">
-            <h4>Field Overview</h4>
-            <div class="doc-overview-container">
-                <table class="highlight responsive-table">
-                    <thead>
-                    <tr class="overview-header">
-                        <th class="left-column">Field</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="documentedField : ${fields}">
-                        <td class="left-column">
-                            <a field:link="${documentedField.itemBeingDocumented()}"
-                               field:signature="${documentedField.itemBeingDocumented()}"
-                               field:anchor="${documentedField.itemBeingDocumented()}">-</a>
-                        </td>
-                        <td formatteddoc:desc="${documentedField.innerDoc().description()}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Functions Section (cards) -->
     <div th:if="${!functions.isEmpty()}" class="row function-definitions">
         <div class="col s12">
@@ -173,7 +156,7 @@
             <div class="card function-doc hoverable"
                  th:each="documentedFunction : ${functions}">
                 <div th:replace="~{templates/fragments/function_card :: functionCard(${documentedFunction})}"></div>
-            </div> <!-- end function card -->
+            </div>
         </div>
     </div>
 

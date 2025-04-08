@@ -1,0 +1,20 @@
+<th:block th:fragment="fieldOverview(fields)" xmlns:field="http://www.w3.org/1999/xhtml" xmlns:formatteddoc="http://www.w3.org/1999/xhtml">
+    <table class="highlight responsive-table">
+        <thead>
+        <tr class="overview-header">
+            <th class="left-column">Field</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="documentedField : ${fields}">
+            <td class="left-column">
+                <a field:link="${documentedField.itemBeingDocumented()}"
+                   field:signature="${documentedField.itemBeingDocumented()}"
+                   field:anchor="${documentedField.itemBeingDocumented()}">-</a>
+            </td>
+            <td formatteddoc:desc="${documentedField.innerDoc().description()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>

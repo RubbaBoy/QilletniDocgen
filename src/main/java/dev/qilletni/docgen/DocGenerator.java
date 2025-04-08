@@ -86,6 +86,7 @@ public class DocGenerator {
         docParser.createLibraryIndexPage();
         docParser.createLibraryFilesPage();
         docParser.createEntityPages();
+        docParser.createSourceFilePages();
         docParser.writeToCache();
         docParser.createSearchIndex();
 
@@ -105,6 +106,7 @@ public class DocGenerator {
         docParser.createLibraryFilesPage();
         docParser.addExtendedFunctions(onExtensionsDocs);
         docParser.createEntityPages();
+        docParser.createSourceFilePages();
         docParser.writeToCache();
     }
 }

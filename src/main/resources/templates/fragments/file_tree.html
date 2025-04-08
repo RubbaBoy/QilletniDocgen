@@ -1,11 +1,15 @@
-<th:block th:fragment="treeFragment(nodes)">
+<th:block th:fragment="treeFragment(nodes)" xmlns:file="http://www.w3.org/1999/xhtml">
     <ul>
         <!-- Iterate over each node at the current level -->
         <li th:each="node : ${nodes}">
             <i class="material-icons"
                th:text="${node.directory} ? 'folder' : 'insert_drive_file'">
             </i>
-            <span th:text="${node.name}"></span>
+            
+            <span th:if="${node.directory}" th:text="${node.name}"></span>
+            
+            <a th:if="${!node.directory}" th:text="${node.name}" file:link="${node}"></a>
+            
             <!-- If this node is a directory and has children, render them recursively -->
             <div th:if="${node.directory and #lists.isNotEmpty(node.children)}"
                  th:replace="this ::treeFragment(${node.children})">

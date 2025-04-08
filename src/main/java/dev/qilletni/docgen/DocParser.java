@@ -19,8 +19,10 @@ import dev.qilletni.docgen.pages.dialects.constructor.ConstructorDialect;
 import dev.qilletni.docgen.pages.dialects.description.FormattedDocDialect;
 import dev.qilletni.docgen.pages.dialects.entity.EntityDialect;
 import dev.qilletni.docgen.pages.dialects.field.FieldDialect;
+import dev.qilletni.docgen.pages.dialects.file.FileDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
+import dev.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import dev.qilletni.docgen.pages.dialects.utility.TypeUtility;
 import dev.qilletni.docgen.pages.filetree.FileNode;
 import org.slf4j.Logger;
@@ -114,6 +116,7 @@ public class DocParser {
         templateEngine.addDialect(new EntityDialect(libraryName));
         templateEngine.addDialect(new FormattedDocDialect());
         templateEngine.addDialect(new ConstructorDialect());
+        templateEngine.addDialect(new FileDialect(libraryName));
         
         return templateEngine;
     }
@@ -140,7 +143,7 @@ public class DocParser {
 
         var outputDir = Files.createDirectories(outputPath.resolve(getBasePath()));
 
-        processAndWrite("templates/files.html", outputDir.resolve("files.html"), templateEngine, context);
+        processAndWrite("templates/file_tree.html", outputDir.resolve("files.html"), templateEngine, context);
     }
 
     private List<FileNode> buildFileTree(List<Path> filePaths) {
@@ -166,7 +169,7 @@ public class DocParser {
                 if (node == null) {
                     // Determine if this part is a directory (if it is not the last part, or if the file system tells you so)
                     boolean isDirectory = !isLast;
-                    node = new FileNode(part, isDirectory);
+                    node = new FileNode(part, currentPath, isDirectory);
                     currentLevel.add(node);
                 }
                 
@@ -243,7 +246,36 @@ public class DocParser {
             processAndWrite("templates/entity.html", path, templateEngine, context);
         }
     }
+    
+    public void createSourceFilePages() throws IOException {
+        var outputDir = Files.createDirectories(outputPath.resolve(getBasePath())).resolve("file");
+        Files.createDirectories(outputDir);
+        
+        for (DocumentedFile documentedFile : documentedFiles) {
+            var documentedEntities = documentedFile.documentedItems().stream().filter(documentedItem -> documentedItem.itemBeingDocumented() instanceof DocumentedTypeEntity).toList();
+            var documentedFields = documentedFile.documentedItems().stream().filter(documentedItem -> documentedItem.itemBeingDocumented() instanceof DocumentedTypeField).toList();
+            var documentedFunctions = documentedFile.documentedItems().stream().filter(documentedItem -> documentedItem.itemBeingDocumented() instanceof DocumentedTypeFunction).toList();
 
+            var path = outputDir.resolve(AnchorFactory.createAnchorForSourceFile(documentedFile));
+            
+            var context = new Context();
+            context.setVariable("libraryName", libraryName);
+            context.setVariable("library", basicQllData);
+            context.setVariable("fileName", documentedFile.fileName());
+            context.setVariable("filePath", documentedFile.importPath().toString().replace("\\", "/"));
+            context.setVariable("currentPath", path.toString());
+            context.setVariable("descriptionFormatter", descriptionFormatter);
+            
+            context.setVariable("fields", documentedFields);
+            context.setVariable("functions", documentedFunctions);
+            context.setVariable("entities", documentedEntities);
+
+            var templateEngine = createTemplateEngine();
+
+            processAndWrite("templates/file.html", path, templateEngine, context);
+        }
+    }
+    
     public void addExtendedFunctions(List<DocumentedItem> addingOnExtensionsDocs) {
         for (DocumentedItem addingDocItem : addingOnExtensionsDocs) {
             
