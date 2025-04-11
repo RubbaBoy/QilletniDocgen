@@ -1,10 +1,7 @@
-package dev.qilletni.docgen.pages.dialects.function;
+package dev.qilletni.docgen.pages.dialects.link;
 
-import dev.qilletni.api.lang.docs.structure.DocumentedItem;
-import dev.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
-import dev.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 import dev.qilletni.docgen.pages.dialects.utility.AnchorFactory;
-import dev.qilletni.docgen.pages.dialects.utility.TypeUtility;
+import dev.qilletni.docgen.pages.filetree.FileNode;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -16,15 +13,12 @@ import org.thymeleaf.templatemode.TemplateMode;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
-/**
- * Creates a link to a function page.
- */
-public class FunctionOnHrefAttributeTagProcessor extends AbstractAttributeTagProcessor {
+public class HtmlSuffixAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
-    private static final String ATTR_NAME = "onlink";
+    private static final String ATTR_NAME = "htmlSuffix";
     private static final int PRECEDENCE = 10000;
 
-    protected FunctionOnHrefAttributeTagProcessor(String dialectPrefix) {
+    protected HtmlSuffixAttributeTagProcessor(String dialectPrefix) {
         super(
                 TemplateMode.HTML, // This processor will apply only to HTML mode
                 dialectPrefix,     // Prefix to be applied to name for matching
@@ -44,14 +38,19 @@ public class FunctionOnHrefAttributeTagProcessor extends AbstractAttributeTagPro
         var expr = expressionParser.parseExpression(context, attributeValue);
 
         var executed = expr.execute(context);
-        if (!(executed instanceof DocumentedItem(DocumentedTypeFunction documentedFunction, FunctionDoc functionDoc))) {
-            throw new RuntimeException("Expected a DocumentedTypeFunction, got " + executed);
+        
+        if (!(executed instanceof String link)) {
+            throw new RuntimeException("Expected a String, got " + executed);
         }
 
-        var onStatusInfo = TypeUtility.getOnStatus(((DocumentedItem) executed));
-
-        var pageLinkText = "/library/%s/entity/%s%s".formatted(URLEncoder.encode(onStatusInfo.libraryName(), Charset.defaultCharset()), URLEncoder.encode(onStatusInfo.entityName(), Charset.defaultCharset()), AnchorFactory.HTML_SUFFIX);
-
-        structureHandler.setAttribute("href", "%s#%s".formatted(pageLinkText, AnchorFactory.createAnchorForFunction(documentedFunction)));
+        if (AnchorFactory.INCLUDE_HTML_SUFFIX) {
+            if (link.endsWith("/")) {
+                link = link.substring(0, link.length() - 1);
+            }
+            
+            link += ".html";
+        }
+        
+        structureHandler.setAttribute("href", link);
     }
 }

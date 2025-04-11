@@ -61,7 +61,7 @@ public class FunctionFromExtensionAttributeTagProcessor extends AbstractAttribut
 
         var onStatusInfo = TypeUtility.getOnStatus(((DocumentedItem) executed));
 
-        var filePageLinkText = "/library/%s/file/%s.html".formatted(URLEncoder.encode(documentedFunction.libraryName(), Charset.defaultCharset()), URLEncoder.encode(documentedFunction.importPath(), Charset.defaultCharset()));
+        var filePageLinkText = "/library/%s/file/%s%s".formatted(URLEncoder.encode(documentedFunction.libraryName(), Charset.defaultCharset()), URLEncoder.encode(documentedFunction.importPath(), Charset.defaultCharset()), AnchorFactory.HTML_SUFFIX);
 
         structureHandler.setAttribute("href", "%s#%s".formatted(filePageLinkText, AnchorFactory.createAnchorForFunction(documentedFunction)));
 

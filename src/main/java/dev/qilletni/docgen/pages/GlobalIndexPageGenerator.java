@@ -2,6 +2,8 @@ package dev.qilletni.docgen.pages;
 
 import dev.qilletni.docgen.cache.BasicQllData;
 import dev.qilletni.docgen.cache.serializer.DocumentationDeserializer;
+import dev.qilletni.docgen.pages.dialects.link.LinkDialect;
+import dev.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -29,6 +31,7 @@ public class GlobalIndexPageGenerator {
 
         var context = new Context();
         context.setVariable("libraries", cachedLibraries);
+        context.setVariable("HTML_SUFFIX", AnchorFactory.HTML_SUFFIX);
 
         var templateEngine = createTemplateEngine();
 
@@ -61,6 +64,7 @@ public class GlobalIndexPageGenerator {
         templateResolver.setSuffix(".html");
 
         TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.addDialect(new LinkDialect());
         templateEngine.setTemplateResolver(templateResolver);
 
         return templateEngine;

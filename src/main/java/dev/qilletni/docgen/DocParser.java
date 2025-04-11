@@ -22,6 +22,7 @@ import dev.qilletni.docgen.pages.dialects.field.FieldDialect;
 import dev.qilletni.docgen.pages.dialects.file.FileDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionDialect;
 import dev.qilletni.docgen.pages.dialects.function.FunctionSignatureAttributeTagProcessor;
+import dev.qilletni.docgen.pages.dialects.link.LinkDialect;
 import dev.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import dev.qilletni.docgen.pages.dialects.utility.TypeUtility;
 import dev.qilletni.docgen.pages.filetree.FileNode;
@@ -117,6 +118,7 @@ public class DocParser {
         templateEngine.addDialect(new FormattedDocDialect());
         templateEngine.addDialect(new ConstructorDialect());
         templateEngine.addDialect(new FileDialect(libraryName));
+        templateEngine.addDialect(new LinkDialect());
         
         return templateEngine;
     }
@@ -233,7 +235,6 @@ public class DocParser {
             context.setVariable("fileName", documentedType.importPath());
             context.setVariable("name", documentedType.name());
             context.setVariable("description", entityDoc.description());
-            context.setVariable("currentPath", path.toString());
 
             var entityFields = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeField).toList();
             var entityFunctions = entityDoc.containedItems().stream().filter(item -> item.itemBeingDocumented() instanceof DocumentedTypeFunction).toList();
@@ -265,14 +266,13 @@ public class DocParser {
             var documentedFields = documentedFile.documentedItems().stream().filter(documentedItem -> documentedItem.itemBeingDocumented() instanceof DocumentedTypeField).toList();
             var documentedFunctions = documentedFile.documentedItems().stream().filter(documentedItem -> documentedItem.itemBeingDocumented() instanceof DocumentedTypeFunction).toList();
 
-            var path = outputDir.resolve(AnchorFactory.createAnchorForSourceFile(documentedFile));
+            var outputFilePath = outputDir.resolve(AnchorFactory.createHrefForSourceFile(documentedFile) + ".html");
             
             var context = new Context();
             context.setVariable("libraryName", libraryName);
             context.setVariable("library", basicQllData);
             context.setVariable("fileName", documentedFile.fileName());
             context.setVariable("filePath", documentedFile.importPath().toString().replace("\\", "/"));
-            context.setVariable("currentPath", path.toString());
             context.setVariable("descriptionFormatter", descriptionFormatter);
             
             context.setVariable("fields", documentedFields);
@@ -281,7 +281,7 @@ public class DocParser {
 
             var templateEngine = createTemplateEngine();
 
-            processAndWrite("templates/file.html", path, templateEngine, context);
+            processAndWrite("templates/file.html", outputFilePath, templateEngine, context);
         }
     }
     

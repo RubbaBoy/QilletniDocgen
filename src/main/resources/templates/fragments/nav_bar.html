@@ -1,6 +1,6 @@
 <!-- File: templates/fragments/navbar.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:link="http://www.w3.org/1999/xhtml">
 <body>
 
 <th:block th:fragment="navBar(libraryName, enableSearch)">
@@ -21,10 +21,10 @@
 
                 <li><a href="/">All Libraries</a></li>
                 <li th:if="${libraryName != null}">
-                    <a th:href="${'/library/' + libraryName + '/files'}">Library Files</a>
+                    <a link:htmlSuffix="${'/library/' + libraryName + '/files'}">Library Files</a>
                 </li>
                 <li th:if="${libraryName != null}">
-                    <a th:href="${'/library/' + libraryName + '/'}" th:text="${libraryName}">
+                    <a link:indexPage="${'/library/' + libraryName + '/'}" th:text="${libraryName}">
                     </a>
                 </li>
             </ul>

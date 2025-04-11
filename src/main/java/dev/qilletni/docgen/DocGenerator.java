@@ -88,7 +88,7 @@ public class DocGenerator {
         Files.createDirectories(scriptsPath);
         
         copyResourceToDisk("/static/style.css", outputPath.resolve("style.css"));
-        copyResourceToDisk("/static/scripts/search.js", scriptsPath.resolve("scripts.css"));
+        copyResourceToDisk("/static/scripts/search.js", scriptsPath.resolve("search.js"));
     }
 
     public static void copyResourceToDisk(String resourcePath, Path targetPath) throws IOException {

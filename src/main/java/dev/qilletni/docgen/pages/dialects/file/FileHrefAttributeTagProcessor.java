@@ -1,6 +1,5 @@
 package dev.qilletni.docgen.pages.dialects.file;
 
-import dev.qilletni.api.lang.docs.structure.DocumentedFile;
 import dev.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import dev.qilletni.docgen.pages.filetree.FileNode;
 import org.thymeleaf.context.ITemplateContext;
@@ -41,16 +40,23 @@ public class FileHrefAttributeTagProcessor extends AbstractAttributeTagProcessor
         var expr = expressionParser.parseExpression(context, attributeValue);
 
         var executed = expr.execute(context);
-        if (!(executed instanceof FileNode fileNode)) {
-            throw new RuntimeException("Expected a FileNode, got " + executed);
+        
+        String anchor;
+        
+        if (executed instanceof FileNode fileNode) {
+            anchor = AnchorFactory.createHrefForSourceFile(fileNode);
+        } else if (executed instanceof String importPath) {
+            anchor = AnchorFactory.createHrefForImportPath(importPath);
+        } else {
+            throw new RuntimeException("Expected a FileNode or String importPath, got " + executed);
         }
 
-        var linkText = getSourceFileUrl(libraryName, AnchorFactory.createAnchorForSourceFile(fileNode));
-
+        var linkText = getSourceFileUrl(libraryName, anchor);
+        
         structureHandler.setAttribute("href", linkText);
     }
 
     public static String getSourceFileUrl(String libraryName, String fileHref) {
-        return "/library/%s/file/%s".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()), URLEncoder.encode(fileHref, Charset.defaultCharset()));
+        return "/library/%s/file/%s%s".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()), URLEncoder.encode(fileHref, Charset.defaultCharset()), AnchorFactory.HTML_SUFFIX);
     }
 }

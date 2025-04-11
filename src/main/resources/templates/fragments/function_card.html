@@ -1,7 +1,7 @@
 <!-- functionCard.html -->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:function="http://www.w3.org/1999/xhtml"
-      xmlns:formatteddoc="http://www.w3.org/1999/xhtml">
+      xmlns:formatteddoc="http://www.w3.org/1999/xhtml" xmlns:file="http://www.w3.org/1999/xhtml">
 
 <div th:fragment="functionCard(documentedFunction)" class="card function-doc hoverable">
     <!-- Card header / signature -->
@@ -65,7 +65,8 @@
         </div>
         
         <div class="bottom-ribbon">
-            <small th:if="${documentedFunction.itemBeingDocumented().importPath() != null}" th:text="${documentedFunction.itemBeingDocumented().libraryName() + ':' + documentedFunction.itemBeingDocumented().importPath()}" class="code file-ribbon"></small>
+            <a th:if="${documentedFunction.itemBeingDocumented().importPath() != null}" th:text="${documentedFunction.itemBeingDocumented().libraryName() + ':' + documentedFunction.itemBeingDocumented().importPath()}"
+               file:link="${documentedFunction.itemBeingDocumented().importPath()}" class="code file-ribbon"></a>
         </div>
     </div>
 </div>

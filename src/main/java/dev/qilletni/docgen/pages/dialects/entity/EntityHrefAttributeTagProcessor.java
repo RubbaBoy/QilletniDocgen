@@ -1,6 +1,7 @@
 package dev.qilletni.docgen.pages.dialects.entity;
 
 import dev.qilletni.api.lang.docs.structure.item.DocumentedTypeEntity;
+import dev.qilletni.docgen.pages.dialects.utility.AnchorFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -56,6 +57,6 @@ public class EntityHrefAttributeTagProcessor extends AbstractAttributeTagProcess
     }
     
     public static String getEntityUrl(String libraryName, String entityName) {
-        return "/library/%s/entity/%s".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()), URLEncoder.encode(entityName, Charset.defaultCharset()));
+        return "/library/%s/entity/%s%s".formatted(URLEncoder.encode(libraryName, Charset.defaultCharset()), URLEncoder.encode(entityName, Charset.defaultCharset()), AnchorFactory.HTML_SUFFIX);
     }
 }

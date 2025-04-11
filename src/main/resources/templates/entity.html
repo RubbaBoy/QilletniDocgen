@@ -17,163 +17,164 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<div class="wrapper">
+    <div th:replace="~{templates/fragments/nav_bar :: navBar(${libraryName}, true)}"></div>
 
-<div th:replace="~{templates/fragments/nav_bar :: navBar(${libraryName}, true)}"></div>
+    <!-- Main container -->
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Title & Intro -->
+        <div class="row">
+            <div class="col s12">
+                <h2 class="library-title" th:text="${name}"></h2>
+                <code class="library-version" th:text="${fileName}"></code>
 
-<!-- Main container -->
-<div class="container" style="margin-top: 2rem;">
-    <!-- Title & Intro -->
-    <div class="row">
-        <div class="col s12">
-            <h2 class="library-title" th:text="${name}"></h2>
-            <code class="library-version" th:text="${fileName}"></code>
-
-            <div class="page-description">
-                <p formatteddoc:desc="${description}"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Constructor Overview (if constructors exist) -->
-    <div th:if="${!constructors.isEmpty()}" class="row doc-overview">
-        <div class="col s12">
-            <h4>Constructor Overview</h4>
-            <div class="doc-overview-container">
-                <table class="highlight responsive-table">
-                    <thead>
-                    <tr class="overview-header">
-                        <th class="left-column">Constructor</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="documentedConstructor : ${constructors}">
-                        <td class="left-column">
-                            <!-- Link placeholder for the constructor -->
-                            <a constructor:link="${documentedConstructor.itemBeingDocumented()}"
-                               constructor:signature="${documentedConstructor.itemBeingDocumented()}" class="monospace">-</a>
-                        </td>
-                        <td formatteddoc:desc="${documentedConstructor.innerDoc().description()}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Function Overview (if functions exist) -->
-    <div th:if="${!functions.isEmpty()}" class="row doc-overview">
-        <div class="col s12">
-            <h4>Function Overview</h4>
-            <div class="doc-overview-container">
-                <table class="highlight responsive-table">
-                    <thead>
-                    <tr class="overview-header">
-                        <th class="left-column">Function</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="documentedFunction : ${allFunctions}">
-                        <td class="left-column">
-                            <a function:link="${documentedFunction.itemBeingDocumented()}"
-                               function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
-                            <!-- Extension info placeholder, if any -->
-                            <a function:fromExtension="${documentedFunction}" class="from-extension monospace"></a>
-                        </td>
-                        <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Fields section (simple list) -->
-    <div th:if="${!fields.isEmpty()}" class="row doc-overview">
-        <div class="col s12">
-            <h4>Field Overview</h4>
-            <div class="doc-overview-container">
-                <div th:replace="~{templates/fragments/field_overview :: fieldOverview(${fields})}"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Constructors Section (cards) -->
-    <div th:if="${!constructors.isEmpty()}" class="row constructor-definitions">
-        <div class="col s12">
-            <h4>Constructors</h4>
-
-            <div class="card function-doc hoverable"
-                 th:each="documentedConstructor : ${constructors}">
-                <!-- Card header (constructor signature and anchor) -->
-                <div class="card-content teal lighten-4 function-signature"
-                     constructor:anchor="${documentedConstructor.itemBeingDocumented()}">
-                    <span class="code" constructor:signature="${documentedConstructor.itemBeingDocumented()}"></span>
-                    <a class="function-anchor right"
-                       th:if="${documentedConstructor.itemBeingDocumented() != null}"
-                       constructor:link="${documentedConstructor.itemBeingDocumented()}">
-                        <i class="material-icons">link</i>
-                    </a>
+                <div class="page-description">
+                    <p formatteddoc:desc="${description}"></p>
                 </div>
+            </div>
+        </div>
 
-                <!-- Card body (inner doc, params, etc.) -->
-                <div class="card-content function-innerdoc">
-                    <p formatteddoc:desc="${documentedConstructor.innerDoc().description()}"></p>
+        <!-- Constructor Overview (if constructors exist) -->
+        <div th:if="${!constructors.isEmpty()}" class="row doc-overview">
+            <div class="col s12">
+                <h4>Constructor Overview</h4>
+                <div class="doc-overview-container">
+                    <table class="highlight responsive-table">
+                        <thead>
+                        <tr class="overview-header">
+                            <th class="left-column">Constructor</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="documentedConstructor : ${constructors}">
+                            <td class="left-column">
+                                <!-- Link placeholder for the constructor -->
+                                <a constructor:link="${documentedConstructor.itemBeingDocumented()}"
+                                   constructor:signature="${documentedConstructor.itemBeingDocumented()}" class="monospace">-</a>
+                            </td>
+                            <td formatteddoc:desc="${documentedConstructor.innerDoc().description()}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Params (if any) -->
-                    <div th:if="${!documentedConstructor.innerDoc().paramDocs().isEmpty()}"
-                         class="function-param-container" style="margin-top:1rem;">
-                        <span class="function-params" style="font-weight:600;">Params</span>
-                        <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;">
-                            <tbody>
-                            <tr th:each="param : ${documentedConstructor.innerDoc().paramDocs()}"
-                                style="vertical-align: top;">
-                                <td class="code-param" style="padding:0.5rem 1rem 0.5rem 0;">
-                                    <!-- Param name and type on one line -->
-                                    <code th:text="${param.name()}"></code>
-                                    <span th:if="${param.docFieldType() != null}">
+        <!-- Function Overview (if functions exist) -->
+        <div th:if="${!functions.isEmpty()}" class="row doc-overview">
+            <div class="col s12">
+                <h4>Function Overview</h4>
+                <div class="doc-overview-container">
+                    <table class="highlight responsive-table">
+                        <thead>
+                        <tr class="overview-header">
+                            <th class="left-column">Function</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="documentedFunction : ${allFunctions}">
+                            <td class="left-column">
+                                <a function:link="${documentedFunction.itemBeingDocumented()}"
+                                   function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
+                                <!-- Extension info placeholder, if any -->
+                                <a function:fromExtension="${documentedFunction}" class="from-extension monospace"></a>
+                            </td>
+                            <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fields section (simple list) -->
+        <div th:if="${!fields.isEmpty()}" class="row doc-overview">
+            <div class="col s12">
+                <h4>Field Overview</h4>
+                <div class="doc-overview-container">
+                    <div th:replace="~{templates/fragments/field_overview :: fieldOverview(${fields})}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Constructors Section (cards) -->
+        <div th:if="${!constructors.isEmpty()}" class="row constructor-definitions">
+            <div class="col s12">
+                <h4>Constructors</h4>
+
+                <div class="card function-doc hoverable"
+                     th:each="documentedConstructor : ${constructors}">
+                    <!-- Card header (constructor signature and anchor) -->
+                    <div class="card-content teal lighten-4 function-signature"
+                         constructor:anchor="${documentedConstructor.itemBeingDocumented()}">
+                        <span class="code" constructor:signature="${documentedConstructor.itemBeingDocumented()}"></span>
+                        <a class="function-anchor right"
+                           th:if="${documentedConstructor.itemBeingDocumented() != null}"
+                           constructor:link="${documentedConstructor.itemBeingDocumented()}">
+                            <i class="material-icons">link</i>
+                        </a>
+                    </div>
+
+                    <!-- Card body (inner doc, params, etc.) -->
+                    <div class="card-content function-innerdoc">
+                        <p formatteddoc:desc="${documentedConstructor.innerDoc().description()}"></p>
+
+                        <!-- Params (if any) -->
+                        <div th:if="${!documentedConstructor.innerDoc().paramDocs().isEmpty()}"
+                             class="function-param-container" style="margin-top:1rem;">
+                            <span class="function-params" style="font-weight:600;">Params</span>
+                            <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;">
+                                <tbody>
+                                <tr th:each="param : ${documentedConstructor.innerDoc().paramDocs()}"
+                                    style="vertical-align: top;">
+                                    <td class="code-param" style="padding:0.5rem 1rem 0.5rem 0;">
+                                        <!-- Param name and type on one line -->
+                                        <code th:text="${param.name()}"></code>
+                                        <span th:if="${param.docFieldType() != null}">
                                             (<a function:paramtype="${param.docFieldType()}"></a>)
                                         </span>
-                                </td>
-                                <td style="padding:0.5rem;">
-                                    <span formatteddoc:desc="${param.description()}"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                    </td>
+                                    <td style="padding:0.5rem;">
+                                        <span formatteddoc:desc="${param.description()}"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                </div> <!-- end constructor card -->
+            </div>
+        </div>
+
+        <!-- Functions Section (cards) -->
+        <div th:if="${!functions.isEmpty()}" class="row function-definitions">
+            <div class="col s12">
+                <h4>Functions</h4>
+
+                <div class="card function-doc hoverable"
+                     th:each="documentedFunction : ${functions}">
+                    <div th:replace="~{templates/fragments/function_card :: functionCard(${documentedFunction})}"></div>
                 </div>
-            </div> <!-- end constructor card -->
+            </div>
         </div>
-    </div>
 
-    <!-- Functions Section (cards) -->
-    <div th:if="${!functions.isEmpty()}" class="row function-definitions">
-        <div class="col s12">
-            <h4>Functions</h4>
+        <!-- Extension Functions (cards) -->
+        <div th:if="${!extensionFunctions.isEmpty()}" class="row function-definitions">
+            <div class="col s12">
+                <h4>Extension Functions</h4>
 
-            <div class="card function-doc hoverable"
-                 th:each="documentedFunction : ${functions}">
-                <div th:replace="~{templates/fragments/function_card :: functionCard(${documentedFunction})}"></div>
+                <div class="card function-doc hoverable"
+                     th:each="documentedFunction : ${extensionFunctions}">
+                    <div th:replace="~{templates/fragments/function_card :: functionCard(${documentedFunction})}"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Extension Functions (cards) -->
-    <div th:if="${!extensionFunctions.isEmpty()}" class="row function-definitions">
-        <div class="col s12">
-            <h4>Extension Functions</h4>
-
-            <div class="card function-doc hoverable"
-                 th:each="documentedFunction : ${extensionFunctions}">
-                <div th:replace="~{templates/fragments/function_card :: functionCard(${documentedFunction})}"></div>
-            </div>
-        </div>
-    </div>
+    <div th:replace="~{templates/fragments/footer :: footer}"></div>
 </div>
-
-<div th:replace="~{templates/fragments/footer :: footer}"></div>
 
 <!-- Materialize JS (for any interactive components) -->
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>-->

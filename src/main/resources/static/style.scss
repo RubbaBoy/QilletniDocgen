@@ -23,6 +23,16 @@ nav .nav-wrapper .brand-logo {
     color: #37474f; /* subtle dark color for code text */
 }
 
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+}
+
 .title-row {
     .library-title {
         margin-bottom: 0.25em;
@@ -130,6 +140,10 @@ nav .nav-wrapper .brand-logo {
         display: flex;
         justify-content: flex-end;
         margin-top: 10px;
+        
+        .file-ribbon {
+            font-size: 75%; // from `small`
+        }
     }
 }
 

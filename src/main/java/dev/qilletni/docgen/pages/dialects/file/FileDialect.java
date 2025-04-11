@@ -5,7 +5,7 @@ import org.thymeleaf.processor.IProcessor;
 
 import java.util.Set;
 
-public class FileDialect  extends AbstractProcessorDialect {
+public class FileDialect extends AbstractProcessorDialect {
 
     private final String libraryName;
 

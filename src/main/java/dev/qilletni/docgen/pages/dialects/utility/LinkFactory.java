@@ -1,6 +1,8 @@
 package dev.qilletni.docgen.pages.dialects.utility;
 
 import dev.qilletni.api.lang.docs.structure.DocFieldType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 
 import java.net.URLEncoder;
@@ -9,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LinkFactory {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkFactory.class);
     
     public static final String JAVA_DOC_BASE_URL = "https://docs.oracle.com/en/java/javase/21/docs/api/";
     private static final Map<String, String> MODULE_MAP = new HashMap<>();
@@ -50,7 +54,8 @@ public class LinkFactory {
         // Determine module name
         String moduleName = MODULE_MAP.get(packageName);
         if (moduleName == null) {
-            throw new IllegalArgumentException("No module found for package: " + packageName);
+            LOGGER.warn("No module found for package: {}", packageName);
+            return "";
         }
 
         // Replace dots with slashes and append .html
@@ -78,7 +83,7 @@ public class LinkFactory {
     }
 
     private static String generateQilletniTypeLink(String libraryName, String qilletniType) {
-        return "/library/%s/entity/%s".formatted(libraryName, qilletniType);
+        return "/library/%s/entity/%s%s".formatted(libraryName, qilletniType, AnchorFactory.HTML_SUFFIX);
     }
 
     static {
