@@ -30,7 +30,13 @@
     <div class="row title-row">
         <div class="col s12">
             <h2 class="library-title">Library <span th:text="${libraryName}"></span></h2>
-            <span class="library-version"><span th:text="${'v' + library.version()}"></span> &#x2022; <span th:text="${library.author()}"></span></span>
+            <div class="library-meta">
+                <span class="library-version"><span th:text="${'v' + library.version()}"></span> &#x2022; <span th:text="${library.author()}"></span></span>
+                <span>
+                    <a class="library-github" target="_blank" th:href="${sourceUrl}">GitHub</a>
+                    <a class="library-examples" target="_blank" th:href="${sourceUrl + '/examples'}">Examples</a>
+                </span>
+            </div>
 
             <div class="page-description">
                 <p th:text="${library.description()}"></p>
@@ -40,108 +46,95 @@
 
     <!-- Library Sections Row -->
     <div class="row library-sections">
-        <!-- Left column  was m6 -->
-<!--        <div class="col s12">-->
-<!--            <div class="category-column">-->
-
-                <!-- Entities Section -->
-                <div class="card l-box library-category">
-                    <div class="card-content">
-                        <h3 class="content-subhead">Entities</h3>
-                        <div class="category-list">
-                            <table class="highlight responsive-table">
-                                <tbody>
-                                <tr th:each="documentedEntity : ${entityDocs}">
-                                    <td>
-                                        <a entity:link="${documentedEntity.itemBeingDocumented()}"
-                                           th:text="${documentedEntity.itemBeingDocumented().name()}" class="monospace">-</a>
-                                    </td>
-                                    <td th:text="${descriptionFormatter.getShortPlainDescription(documentedEntity.innerDoc(), 300)}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        <!-- Entities Section -->
+        <div class="card l-box library-category">
+            <div class="card-content">
+                <h3 class="content-subhead">Entities</h3>
+                <div class="category-list">
+                    <table class="highlight responsive-table">
+                        <tbody>
+                        <tr th:each="documentedEntity : ${entityDocs}">
+                            <td>
+                                <a entity:link="${documentedEntity.itemBeingDocumented()}"
+                                   th:text="${documentedEntity.itemBeingDocumented().name()}" class="monospace">-</a>
+                            </td>
+                            <td th:text="${descriptionFormatter.getShortPlainDescription(documentedEntity.innerDoc(), 300)}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
+        </div>
 
-                <!-- Global Functions Section -->
-                <div class="card l-box library-category">
-                    <div class="card-content">
-                        <h3 class="content-subhead">Global Functions</h3>
-                        <div class="category-list">
-                            <table class="highlight responsive-table">
-                                <tbody>
-                                <tr th:each="documentedFunction : ${functionDocs}">
-                                    <td>
-                                        <a function:link="${documentedFunction.itemBeingDocumented()}"
-                                           function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
-                                    </td>
-                                    <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        <!-- Global Functions Section -->
+        <div class="card l-box library-category">
+            <div class="card-content">
+                <h3 class="content-subhead">Global Functions</h3>
+                <div class="category-list">
+                    <table class="highlight responsive-table">
+                        <tbody>
+                        <tr th:each="documentedFunction : ${functionDocs}">
+                            <td>
+                                <a function:link="${documentedFunction.itemBeingDocumented()}"
+                                   function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
+                            </td>
+                            <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
+        </div>
 
-<!--            </div>-->
-<!--        </div>-->
 
-        <!-- Right column  was m6 -->
-<!--        <div class="col s12">-->
-<!--            <div class="category-column">-->
+        <!-- Import Aliases Section -->
+        <!--                <div class="card l-box library-category">-->
+        <!--                    <div class="card-content">-->
+        <!--                        <h3 class="content-subhead">Import Aliases</h3>-->
+        <!--                        <div class="category-list">-->
+        <!--                            <table class="highlight responsive-table">-->
+        <!--                                <tbody>-->
+        <!--                                <tr>-->
+        <!--                                    <td><a href="#">spotify</a></td>-->
+        <!--                                    <td>This is a description for spotify.</td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td><a href="#">spotify.builder</a></td>-->
+        <!--                                    <td>This is a description for spotify.builder.</td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td><a href="#">spotify.friends</a></td>-->
+        <!--                                    <td>This is a description for spotify.friends.</td>-->
+        <!--                                </tr>-->
+        <!--                                <tr>-->
+        <!--                                    <td><a href="#">audio</a></td>-->
+        <!--                                    <td>This is a description for audio.</td>-->
+        <!--                                </tr>-->
+        <!--                                </tbody>-->
+        <!--                            </table>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
 
-                <!-- Import Aliases Section -->
-<!--                <div class="card l-box library-category">-->
-<!--                    <div class="card-content">-->
-<!--                        <h3 class="content-subhead">Import Aliases</h3>-->
-<!--                        <div class="category-list">-->
-<!--                            <table class="highlight responsive-table">-->
-<!--                                <tbody>-->
-<!--                                <tr>-->
-<!--                                    <td><a href="#">spotify</a></td>-->
-<!--                                    <td>This is a description for spotify.</td>-->
-<!--                                </tr>-->
-<!--                                <tr>-->
-<!--                                    <td><a href="#">spotify.builder</a></td>-->
-<!--                                    <td>This is a description for spotify.builder.</td>-->
-<!--                                </tr>-->
-<!--                                <tr>-->
-<!--                                    <td><a href="#">spotify.friends</a></td>-->
-<!--                                    <td>This is a description for spotify.friends.</td>-->
-<!--                                </tr>-->
-<!--                                <tr>-->
-<!--                                    <td><a href="#">audio</a></td>-->
-<!--                                    <td>This is a description for audio.</td>-->
-<!--                                </tr>-->
-<!--                                </tbody>-->
-<!--                            </table>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-                <!-- Extension Functions Section -->
-                <div class="card l-box library-category">
-                    <div class="card-content">
-                        <h3 class="content-subhead">Extension Functions</h3>
-                        <div class="category-list">
-                            <table class="highlight responsive-table">
-                                <tbody>
-                                <tr th:each="documentedFunction : ${onExtensionDocs}">
-                                    <td>
-                                        <a function:onlink="${documentedFunction}"
-                                           function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
-                                    </td>
-                                    <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        <!-- Extension Functions Section -->
+        <div class="card l-box library-category">
+            <div class="card-content">
+                <h3 class="content-subhead">Extension Functions</h3>
+                <div class="category-list">
+                    <table class="highlight responsive-table">
+                        <tbody>
+                        <tr th:each="documentedFunction : ${onExtensionDocs}">
+                            <td>
+                                <a function:onlink="${documentedFunction}"
+                                   function:signature="${documentedFunction.itemBeingDocumented()}" class="monospace">-</a>
+                            </td>
+                            <td th:text="${descriptionFormatter.getShortPlainDescription(documentedFunction.innerDoc(), 200)}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-<!--            </div>-->
-<!--        </div>-->
+            </div>
+        </div>
     </div>
 
     <!-- Function Definitions -->
@@ -153,7 +146,7 @@
         </div>
     </div>
 
-</div> <!-- /container -->
+</div>
 
 <!-- Footer -->
 <div th:replace="~{templates/fragments/footer :: footer}"></div>

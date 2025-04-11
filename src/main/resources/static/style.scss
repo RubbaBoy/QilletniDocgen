@@ -29,10 +29,19 @@ nav .nav-wrapper .brand-logo {
         font-family: var(--sans-font-family), sans-serif;
     }
     
-    .library-version {
-        opacity: 0.8;
-        margin-left: 0.5em;
+    .library-meta {
+        display: flex;
+        justify-content: space-between;
         font-size: 0.9em;
+        
+        .library-version {
+            opacity: 0.8;
+            margin-left: 0.5em;
+        }
+        
+        .library-github {
+            margin-right: 1em;
+        }
     }
 }
 

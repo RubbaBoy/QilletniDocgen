@@ -272,8 +272,9 @@ public class DocumentationDeserializer implements AutoCloseable {
         var version = unpacker.unpackString();
         var author = unpacker.unpackString();
         var description = unpacker.unpackString();
+        var sourceUrl = unpacker.unpackString();
         
-        return new BasicQllData(name, version, author, description);
+        return new BasicQllData(name, version, author, description, sourceUrl);
     }
 
     @Override

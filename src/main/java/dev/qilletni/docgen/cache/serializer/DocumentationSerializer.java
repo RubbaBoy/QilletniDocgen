@@ -231,6 +231,7 @@ public class DocumentationSerializer implements AutoCloseable {
         packer.packString(basicQllData.version());
         packer.packString(basicQllData.author());
         packer.packString(basicQllData.description());
+        packer.packString(basicQllData.sourceUrl());
     }
 
     public enum NilPlaceholder {

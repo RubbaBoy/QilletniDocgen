@@ -188,6 +188,7 @@ public class DocParser {
         
         var context = new Context();
         context.setVariable("libraryName", libraryName);
+        context.setVariable("sourceUrl", normalizeSourceUrl(basicQllData.sourceUrl()));
         context.setVariable("library", basicQllData);
         context.setVariable("entityDocs", entityDocs);
         context.setVariable("functionDocs", functionDocs);
@@ -201,6 +202,14 @@ public class DocParser {
         var outputDir = Files.createDirectories(outputPath.resolve(getBasePath()));
 
         processAndWrite("templates/library.html", outputDir.resolve("index.html"), templateEngine, context);
+    }
+    
+    private String normalizeSourceUrl(String sourceUrl) {
+        if (sourceUrl.endsWith("/")) {
+            return sourceUrl.substring(0, sourceUrl.length() - 1);
+        } else {
+            return sourceUrl;
+        }
     }
 
     public void createEntityPages() throws IOException {
