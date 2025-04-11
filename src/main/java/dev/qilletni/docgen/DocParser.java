@@ -369,7 +369,7 @@ public class DocParser {
 
         if (isStd) {
             TypeUtility.NATIVE_QILLETNI_TYPES.forEach(type -> {
-                var entityDoc = new EntityDoc(new DocDescription(List.of(new DocDescription.DocText("This is a native Qilletni type. TODO: Add native type examples/descriptions")))); // TODO: Add native type examples/descriptions
+                var entityDoc = new EntityDoc(new DocDescription(List.of(new DocDescription.DocText(TypeUtility.getNativeTypeDescription(type)))));
                 entityDocs.add(new DocumentedItem(new DocumentedTypeEntity(libraryName, "std", type), entityDoc));
             });
         }

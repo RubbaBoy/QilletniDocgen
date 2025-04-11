@@ -5,14 +5,31 @@ import dev.qilletni.api.lang.docs.structure.item.DocumentedTypeFunction;
 import dev.qilletni.api.lang.docs.structure.text.inner.FunctionDoc;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class TypeUtility {
 
     public static final List<String> NATIVE_QILLETNI_TYPES = List.of("int", "double", "string", "boolean", "collection", "song", "album", "list", "java", "function");
 
+    private static final Map<String, String> NATIVE_TYPE_DESCRIPTIONS = Map.of(
+            "int", "An integer value, up to 64 bits.",
+            "double", "A double precision floating point value, up to 64 bits.",
+            "string", "A character string.",
+            "boolean", "A true/false value.",
+            "collection", "A playlist or collection of songs",
+            "song", "A provider-agnostic piece of music that can be interacted with through service providers.",
+            "album", "A provider-agnostic musical album that can be interacted with through service providers.",
+            "list", "A dynamic collection of types.",
+            "java", "A reference to a Java object, for interacting with native methods."
+    );
+
     public static boolean isNativeType(String qilletniType) {
         return NATIVE_QILLETNI_TYPES.contains(qilletniType);
+    }
+    
+    public static String getNativeTypeDescription(String nativeType) {
+        return NATIVE_TYPE_DESCRIPTIONS.getOrDefault(nativeType, "A Qilletni native type.");
     }
     
     public static OnStatusInfo getOnStatus(DocumentedItem documentedFunctionItem) {
