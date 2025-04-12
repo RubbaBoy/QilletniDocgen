@@ -59,8 +59,8 @@ public class DocParserFactory {
         LOGGER.debug("Documented files:");
 
         for (DocumentedFile documentedFile : documentedFiles) {
-            System.out.println(documentedFile.fileName() + ":");
-            System.out.println(documentedFile + "\n");
+            LOGGER.debug("{}:", documentedFile.fileName());
+            LOGGER.debug("{}\n", documentedFile);
         }
 
         return DocParser.createInitializedParser(cachedDocParserHandler, basicQllData, outputPath, documentedFiles);

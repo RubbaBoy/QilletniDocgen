@@ -322,12 +322,6 @@ public class DocParser {
     private void initDocumentedItems() {
         documentedFiles.stream()
                 .filter(documentedFile -> documentedFile.documentedItems() != null)
-                .flatMap(documentedFile -> documentedFile.documentedItems().stream()).forEach(documentedItem -> {
-//                    System.out.println("documentedItem = " + documentedItem);
-                });
-        
-        documentedFiles.stream()
-                .filter(documentedFile -> documentedFile.documentedItems() != null)
                 .flatMap(documentedFile -> documentedFile.documentedItems().stream())
                 .forEach(documentedItem -> {
                     switch (documentedItem.innerDoc()) {
@@ -352,16 +346,9 @@ public class DocParser {
                     }
                 });
 
-        onExtensionDocs.sort((a, b) -> {
-            return Comparator.comparing((DocumentedItem item) -> ((DocumentedTypeFunction) item.itemBeingDocumented()).onOptional().orElseThrow())
-                    .thenComparing(item -> ((DocumentedTypeFunction) item.itemBeingDocumented()).name())
-                    .compare(a, b);
-            
-//            var aDocumentedTypeFunction = ((DocumentedTypeFunction) a.itemBeingDocumented()).onOptional().orElseThrow();
-//            var bDocumentedTypeFunction = ((DocumentedTypeFunction) b.itemBeingDocumented()).onOptional().orElseThrow();
-//            
-//            return aDocumentedTypeFunction.compareTo(bDocumentedTypeFunction);
-        });
+        onExtensionDocs.sort((a, b) -> Comparator.comparing((DocumentedItem item) -> ((DocumentedTypeFunction) item.itemBeingDocumented()).onOptional().orElseThrow())
+                .thenComparing(item -> ((DocumentedTypeFunction) item.itemBeingDocumented()).name())
+                .compare(a, b));
         
         functionDocs.sort((a, b) -> Comparator.comparing((DocumentedItem item) -> ((DocumentedTypeFunction) item.itemBeingDocumented()).onOptional().isPresent())
                 .thenComparing(item -> ((DocumentedTypeFunction) item.itemBeingDocumented()).name())

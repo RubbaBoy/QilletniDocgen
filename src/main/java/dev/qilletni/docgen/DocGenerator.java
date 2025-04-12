@@ -58,7 +58,7 @@ public class DocGenerator {
                     
                     if (cachedLibraryName.isEmpty()) return;
 
-                    LOGGER.info("  {}", cachedLibraryName);
+                    LOGGER.debug("  {}", cachedLibraryName);
 
                     var cachedLibrary = cachePath.resolve("%s.cache".formatted(cachedLibraryName));
                     if (Files.notExists(cachedLibrary)) {
@@ -69,7 +69,7 @@ public class DocGenerator {
                     items.forEach(item -> {
                         var documentedFunction = (DocumentedTypeFunction) item.itemBeingDocumented();
 
-                        LOGGER.info("    -{}", FunctionSignatureAttributeTagProcessor.getFunctionSignature(documentedFunction));
+                        LOGGER.debug("    -{}", FunctionSignatureAttributeTagProcessor.getFunctionSignature(documentedFunction));
                     });
 
                     try {
